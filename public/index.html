@@ -15,20 +15,65 @@
         #myHeader {
             color: black;
             font-family: Helvetica;
+            text-align: center;
         }
         #aPar {
-            color: rgb(8,42,124);
+            color: black;
             font-family: Helvetica;
+            font-size: 12px;
         }
+        .button {
+            background-color: black; /* Green */
+            border: none;
+            color: white;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            -webkit-transition-duration: 0.4s; /* Safari */
+            transition-duration: 0.4s;
+        }
+        .button2:hover {
+            box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24),0 17px 50px 0 rgba(0,0,0,0.19);
+        }
+        #botbar{
+            position: fixed;
+            z-index: 100;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+        }
+        body {
+            background-color: white
+        }
+
     </style>
     </head>
     <body>
-          <h1 id="myHeader"><i class="fa fa-sticky-note"></i> vTodo </h1>
-          <h3>
+          <h1 id="myHeader">
+              <i class="fa fa-sticky-note fa-spin"></i>
+                vTodo
+              <i class="fa fa-sticky-note fa-spin"></i>
+          </h1>
+          <h3 id="aPar">
               Welcome to vTodo, this project is intended to be a task reminder that can be used both via a gui
               and via cli!
           </h3>
+          <button class = "button button2">
+              Add a Task!
+          </button>
+          <div id="botbar">
+              Contact the user
+              <i class = "fa fa-github">
+              </i>
+          </div>
+
+
     </body>
+
 
 
 </style>
