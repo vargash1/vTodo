@@ -1,80 +1,184 @@
 <!DOCTYPE html>
 <html>
     <head>
-    <!-- test compiled and minified CSS -->
+    <!-- Bootstrap  -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
 
-    <!-- Optional theme -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
-
     <!-- Latest compiled and minified JavaScript -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+
+    <!-- Cool little icons we could use!  -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
-    <title> vTodo> </title>
-    <style>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!--  MY Stuff-->
+    <script src="index.js"></script>
+    <title> vTodo </title>
+     <style>
         #myHeader {
+            text-align: center;
             color: black;
             font-family: Helvetica;
-            text-align: center;
+            /*position : fixed;*/
+
         }
         #aPar {
             color: black;
             font-family: Helvetica;
             font-size: 12px;
+            text-align: center;
         }
         .button {
             background-color: black; /* Green */
             border: none;
             color: white;
-            padding: 15px 32px;
+            padding: 10px 26px;
             text-align: center;
             text-decoration: none;
             display: inline-block;
-            font-size: 16px;
-            margin: 4px 2px;
+            font-size: 10px;
+            margin: 0px auto;
             cursor: pointer;
             -webkit-transition-duration: 0.4s; /* Safari */
             transition-duration: 0.4s;
         }
+        .button1:hover {
+            box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24),0 17px 50px 0 rgba(0,0,0,0.19);
+        }
         .button2:hover {
             box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24),0 17px 50px 0 rgba(0,0,0,0.19);
+        }
+        .button3:hover {
+            box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24),0 17px 50px 0 rgba(0,0,0,0.19);
+        }
+        .wrapper{
+            text-align: center;
         }
         #botbar{
             position: fixed;
             z-index: 100;
             bottom: 0;
             left: 0;
+            text-align: center;
             width: 100%;
+            color: black;
+
         }
-        body {
-            background-color: white
+        .navbar {
+
+            font-size: 12px;
+        }
+        a:link {
+            color: black;
+        }
+        a:visited {
+            color: black;
+        }
+        .quote-container {
+            margin-top: 50px;
+            position: relative;
+        }
+        .note {
+            color: white;
+            position: relative;
+            width: 300px;
+            margin: 0 auto;
+            padding: 20px;
+            font-family: Helvetica;
+            font-size: 12px;
+            box-shadow: 0 10px 10px 2px rgba(0,0,0,0.3);
         }
 
+        .note .author {
+            display: block;
+            margin: 40px 0 0 0;
+            text-align: right;
+        }
+        .yellow {
+            background: black;
+        }
+        body {
+            background-color: white;
+        }
     </style>
     </head>
     <body>
-          <h1 id="myHeader">
-              <i class="fa fa-sticky-note fa-spin"></i>
-                vTodo
-              <i class="fa fa-sticky-note fa-spin"></i>
-          </h1>
-          <h3 id="aPar">
-              Welcome to vTodo, this project is intended to be a task reminder that can be used both via a gui
-              and via cli!
-          </h3>
-          <button class = "button button2">
-              Add a Task!
-          </button>
-          <div id="botbar">
-              Contact the user
-              <i class = "fa fa-github">
-              </i>
-          </div>
+          <!-- NavBar Section  Fixed-->
+          <nav class="navbar navbar-inverse navbar-fixed-top">
+              <div class="container-fluid">
+                  <div class="navbar-header">
+                      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+                          <span class="icon-bar"> </span>
+                          <span class="icon-bar"> </span>
+                          <span class="icon-bar"> </span>
+                      </button>
+                      <a class="navbar-brand" href="#">vTask</a>
+                  </div>
+                  <div class="collapse navbar-collapse" id="myNavbar">
+                  <ul class="nav navbar-nav">
+                      <li class="active"><a href="#"><i class="fa fa-home"></i></a></li>
+                      <li><a href="#"><i class="fa fa-cogs"></i></a></li>
+                      <li><a href="#"><i class="fa fa-info"></i></a></li>
+                      <li><a href="#"><i class="fa fa-envelope-o"></i></a></li>
+                  </ul>
+                  <ul class="nav navbar-nav navbar-right">
+                      <li><a href="#"><i class="fa fa-user"></i>Sign Up</a></li>
+                      <li><a href="#"><i class="fa fa-sign-in"></i> Login</a></li>
+                  </ul>
+              </div>
+            </div>
+          </nav>
+          <!-- NavBar Section  Fixed-->
 
+          <br></br>
+
+          <!-- Le Buttons -->
+          <div class="container">
+              <h1 id="myHeader">
+                <i class="fa fa-sticky-note fa-spin"></i>
+                vTask
+              </h1>
+          </div>
+          <div class = "wrapper">
+              <button class = "button button1" onclick="kek()">
+                  <i class="fa fa-check-square-o"></i> Add Task
+              </button>
+              <botton class = "button button1">
+                  <i class="fa fa-times"></i>  Remove Task
+              </botton>
+              <botton class = "button button3">
+                  <i class="fa fa-wrench"></i> Modify Task
+              </botton>
+          </div>
+          <!-- Le Buttons  -->
+
+          <!--  Sticky Notes -->
+         <div class="quote-container">
+             <blockquote class="note yellow">
+                 I am a task
+             </blockquote>
+        </div>
+        <div class="quote-container">
+            <blockquote class="note yellow">
+                Me Too!
+            </blockquote>
+       </div>
+       <div class="quote-container">
+           <blockquote class="note yellow">
+               Don't forget about me!
+           </blockquote>
+       </div>
+          <!--  Sticky Notes -->
+
+          <!--  Bottom Bar Fixed -->
+          <div id="botbar">
+              <a href="https://github.com/vargash1/vTodo">
+                  <i class = "fa fa-github"></i>
+              </a>
+          </div>
+          <!--  Bottom Bar Fixed-->
 
     </body>
-
-
-
-</style>
 </html>
