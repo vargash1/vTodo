@@ -22,24 +22,23 @@ passport.use(new LocalStrategy({
     passwordField: 'password'
 },
 function(username,password,done){
-    console.log("Connected to Database: pgql");
+    console.log("[INFO] Connected to Database: pgql");
     dbclient.query('SELECT * FROM users WHERE username = $1', [username], function(err, result) {
     if (err){
-        console.log("Database error");
+        console.log("[INFO] Database Query Error");
         return done(err);
     }
     if (result.rows.length > 0){
         var matched = bcrypt.compareSync(password, result.rows[0].password);
         if (matched) {
-            console.log("Successful login");
+            console.log("[INFO] Successful Login");
             return done(null, result.rows[0]);
         }
-        console.log("Bad username or password");
-        return done(null, false);
     }
+    console.log("[INFO] Invalid Username or Password");
+    return done(null, false);
     });
 }));
-
 
 // Store user information into session
 passport.serializeUser(function(user, done) {
@@ -49,7 +48,6 @@ passport.serializeUser(function(user, done) {
 // Get user information out of session
 passport.deserializeUser(function(id, done) {
       dbclient.query('SELECT id, username FROM users WHERE id = $1', [id], function(err, result) {
-      next();
       // Return the user
       if (result) {
         return done(null, result.rows[0]);

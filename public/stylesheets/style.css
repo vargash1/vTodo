@@ -1,8 +1,97 @@
 body {
   padding: 50px;
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+  font-family: 'PT Sans', sans-serif;
+  background-color: white;
 }
 
 a {
   color: #00B7FF;
+}
+#myHeader {
+    text-align: center;
+    color: black;
+    /*position : fixed;*/
+}
+#aPar {
+    color: black;
+    font-size: 12px;
+    text-align: center;
+}
+.button {
+    background-color: black; /* Green */
+    border: none;
+    color: white;
+    padding: 10px 26px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 10px;
+    margin: 0px auto;
+    cursor: pointer;
+    -webkit-transition-duration: 0.4s; /* Safari */
+    transition-duration: 0.4s;
+}
+.button1:hover {
+    box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24),0 17px 50px 0 rgba(0,0,0,0.19);
+}
+.button2:hover {
+    box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24),0 17px 50px 0 rgba(0,0,0,0.19);
+}
+.button3:hover {
+    box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24),0 17px 50px 0 rgba(0,0,0,0.19);
+}
+.wrapper{
+    text-align: center;
+}
+#botbar{
+    position: fixed;
+    z-index: 100;
+    bottom: 0;
+    left: 0;
+    text-align: center;
+    width: 100%;
+    color: black;
+
+}
+.navbar {
+
+    font-size: 12px;
+}
+a:link {
+    color: black;
+}
+a:visited {
+    color: black;
+}
+.quote-container {
+    margin-top: 50px;
+    position: relative;
+}
+.note {
+    color: white    ;
+    position: relative;
+    width: 300px;
+    margin: 0 auto;
+    padding: 20px;
+    font-size: 12px;
+    box-shadow: 0 10px 10px 2px rgba(0,0,0,0.3);
+}
+
+.note .author {
+    display: block;
+    margin: 40px 0 0 0;
+    text-align: right;
+}
+.centerform{
+    display: inline-block;
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+}
+.divform{
+    display: block;
+    text-align: center;
+}
+.yellow {
+    background: black;
 }

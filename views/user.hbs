@@ -1,4 +1,5 @@
-<a href="/users/login">Log in</a><br>
-<a href="/users/signup">Sign up</a><br>
-<a href="/users/logout">Log out</a><br>
-<a href="/users/profile">User profile</a>
+{{#unless user.username}}
+    <div class = "divform">
+        Welcome to vTask, please sign in or create an account!
+    </div>
+{{/unless}}
