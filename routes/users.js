@@ -30,6 +30,14 @@ router.get('/logout',
     res.render('user',{user: req.user});
   });
 
+router.get('/notes',
+    loggedIn,
+    function(req,res){
+        if(req.user){
+            
+        }
+    })
+
 function loggedIn(req, res, next) {
   if (req.user) {
     next();

@@ -22,7 +22,7 @@ passport.use(new LocalStrategy({
     passwordField: 'password'
 },
 function(username,password,done){
-    console.log("[INFO] Connected to Database: pgql");
+    console.log("[INFO] Connected to Database: psql");
     dbclient.query('SELECT * FROM users WHERE username = $1', [username], function(err, result) {
     if (err){
         console.log("[INFO] Database Query Error");

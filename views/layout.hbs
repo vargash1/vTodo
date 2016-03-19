@@ -37,7 +37,7 @@
               <div class="collapse navbar-collapse" id="myNavbar">
               <ul class="nav navbar-nav">
                   <li class="active"><a href="/users"><i class="fa fa-home"></i></a></li>
-              </ul>
+                </ul>
               <ul class="nav navbar-nav navbar-right">
                   {{#if user.username}}
                       <li><a href="/users/logout"><i class="fa fa-sign-out"></i>Log Out</a></li>
@@ -61,10 +61,10 @@
       </div>
       {{#if user.username}}
       <div class = "wrapper">
-          <button class = "button button1" onclick="kek()">
+          <button class = "button" onclick="kek()">
               <i class="fa fa-check-square-o"></i> Add Task
           </button>
-    </div>
+      </div>
       {{/if}}
       <!-- Le Buttons  -->
       {{{body}}}
