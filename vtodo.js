@@ -79,7 +79,6 @@ app.use(passport.session());
 
 app.use('/', routes);
 app.use('/users', users);
-app.use('/notes', notes);
 
 
 // catch 404 and forward to error handler

@@ -60,15 +60,21 @@
           </h1>
       </div>
       {{#if user.username}}
-      <div class = "wrapper">
-          <button class = "button" onclick="kek()">
-              <i class="fa fa-check-square-o"></i> Add Task
-          </button>
-      </div>
+        {{#unless msg}}
+        <div class = "wrapper">
+            <a href="/users/addtask">
+                <button class = "button">
+                    <i class="fa fa-check-square-o"></i> Add Task
+                </button>
+            </a>
+        </div>
+        {{/unless}}
       {{/if}}
       <!-- Le Buttons  -->
-      {{{body}}}
-    <!--  Sticky Notes -->
+      <br>
+
+      <!--  Sticky Notes -->
+        {{{body}}}
       <!-- <div class="quote-container">
           <blockquote class="note yellow">
               I am a task

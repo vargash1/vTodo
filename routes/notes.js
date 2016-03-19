@@ -7,7 +7,7 @@ var dbclient = new pg.Client(conString);
 /* GET home page. */
 router.get('/', function(req, response, next) {
   dbclient.connect(function(err, client, done) {
-    client.query('SELECT * FROM notes', function(err, result) {
+    client.query('SELECT * FROM notes WHERE user', function(err, result) {
       done();
       if (err) {
         response.json(err);
@@ -17,5 +17,6 @@ router.get('/', function(req, response, next) {
     });
   });
 });
+router.get('/no')
 
 module.exports = router;

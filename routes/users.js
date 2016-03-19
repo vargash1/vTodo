@@ -18,7 +18,7 @@ router.get('/login',
   });
 
 router.post('/login',
-  passport.authenticate('local', { failureRedirect: 'login' }),
+  passport.authenticate('local', { failureRedirect: 'login'}),
   function(req, res,next) {
     // res.json(req.user);
     res.render('profile',{user: req.user});
@@ -29,14 +29,6 @@ router.get('/logout',
     req.logout();
     res.render('user',{user: req.user});
   });
-
-router.get('/notes',
-    loggedIn,
-    function(req,res){
-        if(req.user){
-            
-        }
-    })
 
 function loggedIn(req, res, next) {
   if (req.user) {
@@ -61,6 +53,42 @@ router.get('/signup',
     res.render('signup',{user: req.user});
   });
 
+router.get('/addtask',
+    loggedIn,
+    function(req, res){
+        res.render('newtask',{user: req.user, msg: "True"});
+    });
+router.post('/addtask',
+    function(req, res, next){
+        var db = new Promise(function(resolve,reject){
+            dbclient.connect(function(err, client, next){
+                console.log("[INFO] Connected to DB");
+                data.client.query('SELECT * FROM notes WHERE title=$1',[req.body.tasktitle], function(err,result){
+                    if (err){
+                        console.log(err);
+                        console.log("[INFO] Unable to Query DB");
+                    }
+                    else if (result.rows.length > 0){
+                        data.next();
+                        console.log("[INFO] Task with Title already exists");
+                        reject(Error("Title exists"));
+                    }
+                    else{
+                        console.log("[INFO] Task Title available, adding Task");
+                        resolve(data);
+                    }
+                });
+            });
+        });
+        Promise.all(db).then(function(data) {
+          console.log("[INFO] Created Task");
+          data[0].client.query('INSERT INTO notes (title,date,password) VALUES($1,$2,$3)',
+            [req.body.tasktitle, req.body.datedue,req.body.timedue,req.body.taskbody], function(err, result) {
+          });
+        });
+        res.render('users',{title: 'New Task Added!'});
+    });
+
 function validUsername(username) {
   var login = username.trim();
   var ugex = /^[a-zA-Z0-9]+$/;
@@ -70,7 +98,7 @@ function validUsername(username) {
     login.length >= 5;
 
 }
-// i have no clue
+
 function validEmail(email){
     var wtf = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     return wtf.test(email);
@@ -111,7 +139,6 @@ router.post('/signup',
     // Connect to database
     var db = new Promise(function(resolve, reject) {
     dbclient.connect(function(err, client, next) {
-        console.log(err);
         console.log("[INFO] Connected to DB");
         if (err) {
             reject(Error("Unable to connect to database"));
@@ -136,7 +163,7 @@ router.post('/signup',
             reject(Error("User exists"));
         }
         else {
-            console.log("[INFO] Username available.");
+            console.log("[INFO] Username Available, Adding User.");
             resolve(data);
         }
         });
