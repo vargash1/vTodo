@@ -5,7 +5,6 @@ var pg = require('pg')
 var bcrypt = require('bcryptjs');
 var Promise = require('promise');
 var conString = "pg://vargash1:guest@localhost:5432/vtodo_db";
-var dbclient = new pg.Client(conString);
 
 /* GET users listing. */
 router.get('/', function(req, res, next) {
@@ -19,7 +18,7 @@ router.get('/login',
 
 router.post('/login',
   passport.authenticate('local', { failureRedirect: 'login'}),
-  function(req, res,next) {
+  function(req, res, next) {
     // res.json(req.user);
     res.render('profile',{user: req.user});
   });
@@ -61,12 +60,12 @@ router.get('/addtask',
 router.post('/addtask',
     function(req, res, next){
         var db = new Promise(function(resolve,reject){
-        dbclient.connect(function(err, client, next){
+        pg.connect(conString,function(err, client, done){
             console.log("[INFO] Connected to DB");
             if(err){
                 reject(Error("Unable to Connect to DB"));
             }else{
-                resolve({'client':client,'next':next});
+                resolve({'client':client,'done':done});
             }
         });
         }).then(function(data) {
@@ -76,15 +75,17 @@ router.post('/addtask',
                     if (err){
                         console.log(err);
                         console.log("[INFO] Unable to Query DB");
+                        done();
                     }
                     else if (result.rows.length > 0){
-                        data.next();
                         console.log("[INFO] Task with Title already exists");
                         reject(Error("Title exists"));
+                        res.render('addtask',{user: req.user, warnmsg: "Task with title already exists"});
+                        done();
                     }
                     else{
                         console.log("[INFO] Task Title available, adding Task");
-                            resolve(data);
+                        resolve(data);
                     }
                 });
             });
@@ -93,6 +94,7 @@ router.post('/addtask',
                 console.log("[INFO] Created Task");
                 data[0].client.query('INSERT INTO notes (title,date,password) VALUES($1,$2,$3)',
                 [req.body.tasktitle, req.body.datedue,req.body.timedue,req.body.taskbody], function(err, result) {
+                    done();
                 });
             });
         res.render('user',{title: 'New Task Added!'});
@@ -142,12 +144,12 @@ router.post('/signup',
     // Generate a hashed password
     var hashedPassword = new Promise(function(resolve, reject){
       var salt = bcrypt.genSaltSync(10);
-      console.log("hash passwords");
+      console.log("[INFO] Hash Passwords");
       resolve(bcrypt.hashSync(req.body.password, salt));
     });
     // Connect to database
     var db = new Promise(function(resolve, reject) {
-    dbclient.connect(function(err, client, next) {
+    pg.connect(conString,function(err, client, done) {
         console.log("[INFO] Connected to DB");
         if (err) {
             reject(Error("Unable to connect to database"));
@@ -159,7 +161,7 @@ router.post('/signup',
     }).then(function(data) {
       // Check if they're already a user
       return new Promise(function(resolve, reject) {
-        console.log("[INFO] Querying DB");
+        console.log("[INFO] Querying DB for Username Availability");
         data.client.query('SELECT * FROM users WHERE username=$1',[req.body.username], function(err, result) {
         if (err) {
             console.log(err);
@@ -167,14 +169,31 @@ router.post('/signup',
             reject(Error("Unable to query database"));
         }
         else if (result.rows.length > 0) {
-            data.next();
             console.log("[INFO] User with username already exists");
-            reject(Error("User exists"));
+            // reject(Error("Username taken"));
+            res.render('signup',{message: "Username Already Taken!"});
         }
         else {
             console.log("[INFO] Username Available, Adding User.");
             resolve(data);
         }
+        console.log("[INFO] Querying DB for Email Availability");
+        data.client.query('SELECT * FROM users WHERE email=$1',[req.body.email], function(err, result) {
+        if (err) {
+            console.log(err);
+            console.log("[INFO] Unable to Query DB");
+            reject(Error("Unable to query database"));
+        }
+        else if (result.rows.length > 0) {
+            console.log("[INFO] User with email already exists");
+            // reject(Error("Username taken"));
+            res.render('signup',{message: "Email Address Already In Use!"});
+        }
+        else {
+            console.log("[INFO] Email Address Available, Adding User.");
+            resolve(data);
+        }
+
         });
       });
     });
@@ -182,9 +201,9 @@ router.post('/signup',
       console.log("[INFO] Created account");
       data[1].client.query('INSERT INTO users (username,email,password) VALUES($1,$2,$3)', [req.body.username, req.body.email, data[0]], function(err, result) {
       });
+      res.render('index',{title: 'Sucessful Signup'});
     });
-    res.render('index',{title: 'Sucessful Signup'});
-  });
+});
 
 
 module.exports = router;
