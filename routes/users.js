@@ -56,14 +56,23 @@ router.get('/signup',
 router.get('/addtask',
     loggedIn,
     function(req, res){
-        res.render('newtask',{user: req.user, msg: "True"});
+        res.render('addtask',{user: req.user, msg: "True"});
     });
 router.post('/addtask',
     function(req, res, next){
         var db = new Promise(function(resolve,reject){
-            dbclient.connect(function(err, client, next){
-                console.log("[INFO] Connected to DB");
-                data.client.query('SELECT * FROM notes WHERE title=$1',[req.body.tasktitle], function(err,result){
+        dbclient.connect(function(err, client, next){
+            console.log("[INFO] Connected to DB");
+            if(err){
+                reject(Error("Unable to Connect to DB"));
+            }else{
+                resolve({'client':client,'next':next});
+            }
+        });
+        }).then(function(data) {
+            return new Promise(function(resolve,reject){
+                console.log("[INFO] Querying DB");
+                data.client.query('SELECT * FROM notes WHERE username=$1',[req.user], function(err,result){
                     if (err){
                         console.log(err);
                         console.log("[INFO] Unable to Query DB");
@@ -75,18 +84,18 @@ router.post('/addtask',
                     }
                     else{
                         console.log("[INFO] Task Title available, adding Task");
-                        resolve(data);
+                            resolve(data);
                     }
                 });
             });
         });
-        Promise.all(db).then(function(data) {
-          console.log("[INFO] Created Task");
-          data[0].client.query('INSERT INTO notes (title,date,password) VALUES($1,$2,$3)',
-            [req.body.tasktitle, req.body.datedue,req.body.timedue,req.body.taskbody], function(err, result) {
-          });
-        });
-        res.render('users',{title: 'New Task Added!'});
+            Promise.all(db).then(function(data) {
+                console.log("[INFO] Created Task");
+                data[0].client.query('INSERT INTO notes (title,date,password) VALUES($1,$2,$3)',
+                [req.body.tasktitle, req.body.datedue,req.body.timedue,req.body.taskbody], function(err, result) {
+                });
+            });
+        res.render('user',{title: 'New Task Added!'});
     });
 
 function validUsername(username) {
@@ -169,9 +178,6 @@ router.post('/signup',
         });
       });
     });
-    // If we have a legit password,
-    // and nobody else has the account,
-    // create the user
     Promise.all([hashedPassword, db]).then(function(data) {
       console.log("[INFO] Created account");
       data[1].client.query('INSERT INTO users (username,email,password) VALUES($1,$2,$3)', [req.body.username, req.body.email, data[0]], function(err, result) {
