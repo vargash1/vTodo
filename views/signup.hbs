@@ -10,4 +10,11 @@
     {{#if message}}
         <i class="fa fa-exclamation-triangle"></i> {{message}}
     {{/if}}
+    <br>
+    {{#if rules}}
+        {{#each rules}}
+            {{rule}}<br>
+        {{/each}}
+    {{/if}}
+    <br>
 </div>

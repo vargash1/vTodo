@@ -4,7 +4,7 @@ var passport = require('passport');
 var pg = require('pg')
 var bcrypt = require('bcryptjs');
 var Promise = require('promise');
-var conString = "pg://vargash1:guest@localhost:5432/vtodo_db";
+require('dotenv').config();
 
 /* GET users listing. */
 router.get('/', function(req, res, next) {
@@ -57,27 +57,66 @@ router.get('/addtask',
     function(req, res){
         res.render('addtask',{user: req.user, msg: "True"});
     });
+
+function validTaskTitle(ttitle){
+    var modtitle = ttitle.trim();
+    return  modtitle !== '' && modtitle.length >= 3;
+}
+
+function validTaskBody(tbody){
+    var modbody = tbody.trim();
+    return modbody !== '' && modbody.length >= 3;
+}
+
+router.get('/showtasks',
+    loggedIn,
+    function(req,res){
+        res.render('showtasks',{user: req.user});
+});
+
 router.post('/addtask',
     function(req, res, next){
+
+        // Reject invalid task title
+        if (!validTaskTitle(req.body.tasktitle)) {
+            console.log("[INFO] Invalid Task Title!");
+            return res.render('addtask',{
+                message: "Invalid Task Title!",
+                rules: "Task Title must be at least 3 characters long!"
+            });
+        }
+        //Reject invalid task body
+        if (!validTaskBody(req.body.taskbody)){
+            console.log("[INFO] Invalid Task Body!");
+            return res.render('addtask',{
+                message: "Invalid Task Body!",
+                rules: "Task Body must compose of at least 3 characters!"
+            });
+        }
+
         var db = new Promise(function(resolve,reject){
-        pg.connect(conString,function(err, client, done){
+        pg.connect(process.env.CONSTRING,function(err, client, done){
             console.log("[INFO] Connected to DB");
             if(err){
                 reject(Error("Unable to Connect to DB"));
-            }else{
+            }
+            else{
                 resolve({'client':client,'done':done});
             }
         });
         }).then(function(data) {
             return new Promise(function(resolve,reject){
                 console.log("[INFO] Querying DB");
-                data.client.query('SELECT * FROM notes WHERE title=$1',[req.body.title], function(err,result){
+                data.client.query('SELECT * FROM notes WHERE title=$1 AND username=$2',
+                [req.body.title,req.user.username],
+                function(err,result){
                     if (err){
                         console.log(err);
                         console.error("[INFO] Unable to Query DB");
                         reject(Error("Unable to Query DB"));
                     }
                     else if (result.rows.length > 0){
+                        data.client.end();
                         console.log("[INFO] Task with Title already exists");
                         reject(Error("Task with Title already exists!"));
                     }
@@ -91,8 +130,9 @@ router.post('/addtask',
         Promise.all([db]).then(function(data) {
             console.log("[INFO] Created Task");
             data[0].client.query('INSERT INTO notes (username,title,datedue,timedue,taskbody) VALUES($1,$2,$3,$4,$5)',
-            [req.user.username,req.body.tasktitle, req.body.datedue,req.body.timedue,req.body.taskbody],
+            [req.user.username, req.body.tasktitle, req.body.datedue, req.body.timedue, req.body.taskbody],
             function(err, result) {
+                data[0].client.end();
                 res.render('profile',{user: req.user});
                 if(err){
                     console.log(err);
@@ -133,17 +173,34 @@ router.post('/signup',
     // Reject non-users
     if (!validUsername(req.body.username)) {
         console.log("[INFO] Invalid Username!");
-        return res.render('signup', {message: "Invalid Username!"});
+        return res.render('signup',{
+            message: "Invalid Username!",
+            rules: [
+                { rule: "Username must be at least 5 characters long."},
+                { rule: "Username must be composed of alphanumeric values only."}
+            ]
+        });
     }
     //Reject invalid emails
     if (!validEmail(req.body.email)){
         console.log("[INFO] Invalid Email");
-        return res.render('signup',{message: "Invalid Email!"})
+        return res.render('signup',{
+            message: "Invalid Email!",
+            rules: "Please use an valid email!"
+        });
     }
     // Reject weak passwords
     if (!validPassword(req.body.password)) {
         console.log("[INFO] Invalid Password");
-        return res.render('signup',{message: "Invalid Password!"});
+        return res.render('signup',{
+            message: "Invalid Password!",
+            rules: [
+                {rule: "Password must be at least 8 characters long"},
+                {rule: "Password must contain at least one Lowercase letter"},
+                {rule: "Password must contain at least one Uppercase letter"},
+                {rule: "Password must contain at least one Number"}
+            ]
+        });
     }
     // Generate a hashed password
     var hashedPassword = new Promise(function(resolve, reject){
@@ -154,7 +211,7 @@ router.post('/signup',
 
     // Connect to database
     var db = new Promise(function(resolve, reject) {
-    pg.connect(conString,function(err, client, done) {
+    pg.connect(process.env.CONSTRING,function(err, client, next) {
         console.log("[INFO] Connected to DB");
         if (err) {
             reject(Error("Unable to connect to database"));
@@ -163,32 +220,36 @@ router.post('/signup',
             resolve({'client':client,'next':next});
         }
       });
-    }).then(function(data) {
+  }).then(function(data) {
       // Check if they're already a user
       return new Promise(function(resolve, reject) {
         console.log("[INFO] Querying DB for Username Availability");
-        data.client.query('SELECT * FROM users WHERE username=$1 or email=$2',[req.body.username,req.body.email], function(err, result) {
-            if (err) {
-                console.log(err);
-                console.log("[INFO] Unable to Query DB");
-                reject(Error("Unable to query database"));
-            }
-            else if (result.rows.length > 0) {
-                console.log("[INFO] User with username or email already exists");
-                reject(Error("Username or Email Already In Use!"));
-            }
-            else {
-                console.log("[INFO] Username and Email Available.");
-                resolve(data);
-            }
+        data.client.query('SELECT * FROM users WHERE username=$1 or email=$2',
+            [req.body.username,req.body.email],
+            function(err, result) {
+                console.log(data);
+                if (err) {
+                    console.log(err);
+                    console.log("[INFO] Unable to Query DB");
+                    reject(Error("Unable to query database"));
+                }
+                else if (result.rows.length > 0) {
+                    data.next();
+                    console.log("[INFO] User with username or email already exists");
+                    reject(Error("Username or Email Already In Use!"));
+                }
+                else {
+                    console.log("[INFO] Username and Email Available.");
+                    resolve(data);
+                }
             });
         });
     });
     Promise.all([hashedPassword, db]).then(function(data) {
       console.log("[INFO] Created account");
-      data[1].client.query('INSERT INTO users (username,email,password) VALUES($1,$2,$3)',
-        [req.body.username, req.body.email, data[0]],
+      data[1].client.query('INSERT INTO users (username,email,password) VALUES($1,$2,$3)',[req.body.username, req.body.email, data[0]],
         function(err, result) {
+            data[1].next();
             msg = 'Successful Signup, Please sign in to your account '.concat([req.body.username]);
             res.render('login',{message: msg});
         });

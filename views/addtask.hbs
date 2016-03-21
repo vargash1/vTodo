@@ -10,5 +10,14 @@
         </textarea><br>
         <input type="submit" class="button" value="Add Task">
     </form>
-    <br></br>
+    <br>
+    <br>
+    {{#if message}}
+        <i class="fa fa-exclamation-triangle"></i> {{message}}
+    {{/if}}
+    <br>
+    {{#if rules}}
+        {{rules}}
+    {{/if}}
+    <br>
 </div>

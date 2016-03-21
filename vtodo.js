@@ -7,20 +7,19 @@ var favicon = require('serve-favicon');
 var bcrypt = require('bcryptjs');
 var routes = require('./routes/index');
 var users = require('./routes/users');
-var notes = require('./routes/notes');
 var pg = require('pg');
 var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
 var app = express();
 var session = require('express-session');
-var conString = "pg://vargash1:guest@localhost:5432/vtodo_db";
+require('dotenv').config();
 
 passport.use(new LocalStrategy({
     usernameField: 'username',
     passwordField: 'password'
 },
 function(username,password,done){
-    pg.connect(conString, function(err, client, next){
+    pg.connect(process.env.CONSTRING, function(err, client, next){
         if (err){
             console.error("[INFO] Unable To Connect To Database");
         }
