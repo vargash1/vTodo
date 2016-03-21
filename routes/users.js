@@ -71,17 +71,15 @@ router.post('/addtask',
         }).then(function(data) {
             return new Promise(function(resolve,reject){
                 console.log("[INFO] Querying DB");
-                data.client.query('SELECT * FROM notes WHERE username=$1',[req.user], function(err,result){
+                data.client.query('SELECT * FROM notes WHERE title=$1',[req.body.title], function(err,result){
                     if (err){
                         console.log(err);
                         console.log("[INFO] Unable to Query DB");
-                        done();
+                        reject(Error("Unable to Query DB"));
                     }
                     else if (result.rows.length > 0){
                         console.log("[INFO] Task with Title already exists");
-                        reject(Error("Title exists"));
-                        res.render('addtask',{user: req.user, warnmsg: "Task with title already exists"});
-                        done();
+                        reject(Error("Task with Title already exists!"));
                     }
                     else{
                         console.log("[INFO] Task Title available, adding Task");
@@ -90,15 +88,18 @@ router.post('/addtask',
                 });
             });
         });
-            Promise.all(db).then(function(data) {
-                console.log("[INFO] Created Task");
-                data[0].client.query('INSERT INTO notes (title,date,password) VALUES($1,$2,$3)',
-                [req.body.tasktitle, req.body.datedue,req.body.timedue,req.body.taskbody], function(err, result) {
-                    done();
-                });
+        Promise.all(db).then(function(data) {
+            console.log("[INFO] Created Task");
+            data[0].client.query('INSERT INTO notes (username,title,datedue,timedue,taskbody) VALUES($1,$2,$3,$4,$5)',
+            [req.user,req.body.tasktitle, req.body.datedue,req.body.timedue,req.body.taskbody],
+            function(err, result) {
+                res.render('profile',{user: req.user});
             });
-        res.render('user',{title: 'New Task Added!'});
-    });
+        },function(reason){
+            console.log("[INFO] Unable to create task");
+            res.render('addtask',{message:reason})
+        });
+});
 
 function validUsername(username) {
   var login = username.trim();
@@ -147,6 +148,7 @@ router.post('/signup',
       console.log("[INFO] Hash Passwords");
       resolve(bcrypt.hashSync(req.body.password, salt));
     });
+
     // Connect to database
     var db = new Promise(function(resolve, reject) {
     pg.connect(conString,function(err, client, done) {
@@ -162,48 +164,36 @@ router.post('/signup',
       // Check if they're already a user
       return new Promise(function(resolve, reject) {
         console.log("[INFO] Querying DB for Username Availability");
-        data.client.query('SELECT * FROM users WHERE username=$1',[req.body.username], function(err, result) {
-        if (err) {
-            console.log(err);
-            console.log("[INFO] Unable to Query DB");
-            reject(Error("Unable to query database"));
-        }
-        else if (result.rows.length > 0) {
-            console.log("[INFO] User with username already exists");
-            // reject(Error("Username taken"));
-            res.render('signup',{message: "Username Already Taken!"});
-        }
-        else {
-            console.log("[INFO] Username Available, Adding User.");
-            resolve(data);
-        }
-        console.log("[INFO] Querying DB for Email Availability");
-        data.client.query('SELECT * FROM users WHERE email=$1',[req.body.email], function(err, result) {
-        if (err) {
-            console.log(err);
-            console.log("[INFO] Unable to Query DB");
-            reject(Error("Unable to query database"));
-        }
-        else if (result.rows.length > 0) {
-            console.log("[INFO] User with email already exists");
-            // reject(Error("Username taken"));
-            res.render('signup',{message: "Email Address Already In Use!"});
-        }
-        else {
-            console.log("[INFO] Email Address Available, Adding User.");
-            resolve(data);
-        }
-
+        data.client.query('SELECT * FROM users WHERE username=$1 or email=$2',[req.body.username,req.body.email], function(err, result) {
+            if (err) {
+                console.log(err);
+                console.log("[INFO] Unable to Query DB");
+                reject(Error("Unable to query database"));
+            }
+            else if (result.rows.length > 0) {
+                console.log("[INFO] User with username or email already exists");
+                reject(Error("Username or Email Already In Use!"));
+            }
+            else {
+                console.log("[INFO] Username and Email Available.");
+                resolve(data);
+            }
+            });
         });
-      });
     });
     Promise.all([hashedPassword, db]).then(function(data) {
       console.log("[INFO] Created account");
-      data[1].client.query('INSERT INTO users (username,email,password) VALUES($1,$2,$3)', [req.body.username, req.body.email, data[0]], function(err, result) {
-      });
-      res.render('index',{title: 'Sucessful Signup'});
+      data[1].client.query('INSERT INTO users (username,email,password) VALUES($1,$2,$3)',
+        [req.body.username, req.body.email, data[0]],
+        function(err, result) {
+            msg = 'Successful Signup, Please sign in to your account '.concat([req.body.username]);
+            res.render('login',{message: msg});
+        });
+    },function(reason){
+      console.log("[INFO] Unable to Create Account");
+      res.render('signup',{message:reason})
     });
-});
 
+});
 
 module.exports = router;

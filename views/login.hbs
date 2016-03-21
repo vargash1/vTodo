@@ -5,5 +5,9 @@
         <input type="submit" class="button" value="Log in">
     </form>
     <br></br>
-    <a href="signup">Sign Up! <i class="fa fa-user-plus"></i></a>
+    {{#if message}}
+        <i class="fa fa-check-circle"></i> {{message}}
+    {{else}}
+        <a href="signup">Sign Up! <i class="fa fa-user-plus"></i></a>
+    {{/if}}
 </div>
