@@ -74,7 +74,7 @@ router.post('/addtask',
                 data.client.query('SELECT * FROM notes WHERE title=$1',[req.body.title], function(err,result){
                     if (err){
                         console.log(err);
-                        console.log("[INFO] Unable to Query DB");
+                        console.error("[INFO] Unable to Query DB");
                         reject(Error("Unable to Query DB"));
                     }
                     else if (result.rows.length > 0){
@@ -88,12 +88,15 @@ router.post('/addtask',
                 });
             });
         });
-        Promise.all(db).then(function(data) {
+        Promise.all([db]).then(function(data) {
             console.log("[INFO] Created Task");
             data[0].client.query('INSERT INTO notes (username,title,datedue,timedue,taskbody) VALUES($1,$2,$3,$4,$5)',
-            [req.user,req.body.tasktitle, req.body.datedue,req.body.timedue,req.body.taskbody],
+            [req.user.username,req.body.tasktitle, req.body.datedue,req.body.timedue,req.body.taskbody],
             function(err, result) {
                 res.render('profile',{user: req.user});
+                if(err){
+                    console.log(err);
+                }
             });
         },function(reason){
             console.log("[INFO] Unable to create task");
