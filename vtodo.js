@@ -46,7 +46,7 @@ passport.serializeUser(function(user, done) {
 
 // Get user information out of session
 passport.deserializeUser(function(id, done) {
-    pg.connect(conString,function(err,client,next){
+    pg.connect(process.env.CONSTRING,function(err,client,next){
         client.query('SELECT id, username FROM users WHERE id = $1', [id], function(err, result) {
             next()
             // Return the user

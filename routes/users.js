@@ -5,10 +5,14 @@ var pg = require('pg')
 var bcrypt = require('bcryptjs');
 var Promise = require('promise');
 require('dotenv').config();
-
+var usertasks;
 /* GET users listing. */
 router.get('/', function(req, res, next) {
-  res.render('user',{user: req.user});
+    if (req.user){
+        fetchTasks(req,res,next);
+    }
+    console.log(usertasks);
+    res.render('user',{user: req.user, tasks:usertasks});
 });
 
 router.get('/login',
@@ -31,15 +35,16 @@ router.get('/logout',
 
 function loggedIn(req, res, next) {
   if (req.user) {
-    next();
-  } else {
-    res.render('login',{ user: req.user });
+      next();
+  }else{
+      res.render('login',{ user: req.user });
   }
 }
 
 router.get('/profile',
   loggedIn,
   function(req, res){
+
       res.render('profile', { user: req.user });
   });
 
@@ -68,12 +73,32 @@ function validTaskBody(tbody){
     return modbody !== '' && modbody.length >= 3;
 }
 
-router.get('/showtasks',
-    loggedIn,
-    function(req,res){
-        res.render('showtasks',{user: req.user});
-});
+// Fetches all tasks in database that belong to the user
+function fetchTasks(req, res, next){
+    console.log("[INFO] Connecting to Database");
+    pg.connect(process.env.CONSTRING, function(err,client,next){
+        if(err){
+            console.error("[INFO] Unable to Connect to Database");
+        }
+        console.log("[INFO] Querying Database");
+        client.query('SELECT * FROM notes WHERE username = $1',[req.user.username],
+            function(err,result){
+                if (err){
+                    console.error("[INFO] Unable to Query DB");
+                }
+                else if (result.rows.length > 0){
+                    next();
+                    console.log("[INFO] Released Client Back Into Pool");
+                    console.log("[INFO] User's Tasks Found");
+                    usertasks = result.rows;
+                }else{
+                    console.log("[INFO] No Tasks Where Found!");
+                }
+            });
+        });
 
+}
+// Adds a task to the Database
 router.post('/addtask',
     function(req, res, next){
 
@@ -95,29 +120,29 @@ router.post('/addtask',
         }
 
         var db = new Promise(function(resolve,reject){
-        pg.connect(process.env.CONSTRING,function(err, client, done){
-            console.log("[INFO] Connected to DB");
+        console.log("[INFO] Connecting to Database");
+        pg.connect(process.env.CONSTRING,function(err, client, next){
             if(err){
                 reject(Error("Unable to Connect to DB"));
             }
             else{
-                resolve({'client':client,'done':done});
+                resolve({'client':client,'next':next});
             }
         });
         }).then(function(data) {
             return new Promise(function(resolve,reject){
-                console.log("[INFO] Querying DB");
-                data.client.query('SELECT * FROM notes WHERE title=$1 AND username=$2',
-                [req.body.title,req.user.username],
+                console.log("[INFO] Querying Database");
+                data.client.query('SELECT * FROM notes WHERE title=$1 AND username=$2',[req.body.tasktitle,req.user.username],
                 function(err,result){
                     if (err){
                         console.log(err);
                         console.error("[INFO] Unable to Query DB");
                         reject(Error("Unable to Query DB"));
                     }
-                    else if (result.rows.length > 0){
-                        data.client.end();
+                    else if (result.rows.length  > 0){
+                        data.next();
                         console.log("[INFO] Task with Title already exists");
+                        console.log("[INFO] Released Client Back Into Pool");
                         reject(Error("Task with Title already exists!"));
                     }
                     else{
@@ -128,18 +153,22 @@ router.post('/addtask',
             });
         });
         Promise.all([db]).then(function(data) {
-            console.log("[INFO] Created Task");
+            console.log("[INFO] Querying Database");
             data[0].client.query('INSERT INTO notes (username,title,datedue,timedue,taskbody) VALUES($1,$2,$3,$4,$5)',
             [req.user.username, req.body.tasktitle, req.body.datedue, req.body.timedue, req.body.taskbody],
             function(err, result) {
-                data[0].client.end();
-                res.render('profile',{user: req.user});
                 if(err){
-                    console.log(err);
+                    console.log("[INFO] Unable To Insert Note into Database");
+                    console.error(err);
                 }
+                data[0].next();
+                console.log("[INFO] Created Task");
+                console.log("[INFO] Released Client Back Into Pool");
+                res.render('profile',{user: req.user});
+
             });
         },function(reason){
-            console.log("[INFO] Unable to create task");
+            console.log("[INFO] Unable to Create Task");
             res.render('addtask',{message:reason})
         });
 });
@@ -168,9 +197,11 @@ function validPassword(password) {
     pass.search(/[0-9]/) >= 0;
 }
 
+// Handle new signup
 router.post('/signup',
   function(req, res, next) {
-    // Reject non-users
+
+    // Reject invalid username
     if (!validUsername(req.body.username)) {
         console.log("[INFO] Invalid Username!");
         return res.render('signup',{
@@ -181,6 +212,7 @@ router.post('/signup',
             ]
         });
     }
+
     //Reject invalid emails
     if (!validEmail(req.body.email)){
         console.log("[INFO] Invalid Email");
@@ -189,6 +221,7 @@ router.post('/signup',
             rules: "Please use an valid email!"
         });
     }
+
     // Reject weak passwords
     if (!validPassword(req.body.password)) {
         console.log("[INFO] Invalid Password");
@@ -202,6 +235,7 @@ router.post('/signup',
             ]
         });
     }
+
     // Generate a hashed password
     var hashedPassword = new Promise(function(resolve, reject){
       var salt = bcrypt.genSaltSync(10);
@@ -212,7 +246,7 @@ router.post('/signup',
     // Connect to database
     var db = new Promise(function(resolve, reject) {
     pg.connect(process.env.CONSTRING,function(err, client, next) {
-        console.log("[INFO] Connected to DB");
+        console.log("[INFO] Connecting to Database");
         if (err) {
             reject(Error("Unable to connect to database"));
         }
@@ -227,7 +261,6 @@ router.post('/signup',
         data.client.query('SELECT * FROM users WHERE username=$1 or email=$2',
             [req.body.username,req.body.email],
             function(err, result) {
-                console.log(data);
                 if (err) {
                     console.log(err);
                     console.log("[INFO] Unable to Query DB");
@@ -235,7 +268,8 @@ router.post('/signup',
                 }
                 else if (result.rows.length > 0) {
                     data.next();
-                    console.log("[INFO] User with username or email already exists");
+                    console.log("[INFO] Released Client Back Into Pool");
+                    console.log("[INFO] User with Username or Email Already Exists");
                     reject(Error("Username or Email Already In Use!"));
                 }
                 else {
@@ -246,13 +280,15 @@ router.post('/signup',
         });
     });
     Promise.all([hashedPassword, db]).then(function(data) {
-      console.log("[INFO] Created account");
-      data[1].client.query('INSERT INTO users (username,email,password) VALUES($1,$2,$3)',[req.body.username, req.body.email, data[0]],
-        function(err, result) {
-            data[1].next();
-            msg = 'Successful Signup, Please sign in to your account '.concat([req.body.username]);
-            res.render('login',{message: msg});
-        });
+        console.log("[INFO] Querying Database");
+        data[1].client.query('INSERT INTO users (username,email,password) VALUES($1,$2,$3)',[req.body.username, req.body.email, data[0]],
+            function(err, result) {
+                data[1].next();
+                console.log("[INFO] Created New Account!");
+                console.log("[INFO] Released Client Back Into Pool");
+                msg = 'Successful Signup, Please sign in to your account '.concat([req.body.username]);
+                res.render('login',{message: msg});
+            });
     },function(reason){
       console.log("[INFO] Unable to Create Account");
       res.render('signup',{message:reason})
