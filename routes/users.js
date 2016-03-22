@@ -5,26 +5,32 @@ var pg = require('pg')
 var bcrypt = require('bcryptjs');
 var Promise = require('promise');
 require('dotenv').config();
+// untill then...
 var usertasks;
+
 /* GET users listing. */
 router.get('/', function(req, res, next) {
     if (req.user){
         fetchTasks(req,res,next);
     }
-    console.log(usertasks);
     res.render('user',{user: req.user, tasks:usertasks});
 });
 
-router.get('/login',
-  function(req, res){
-    res.render('login',{user: req.user});
+router.get('/login',function(req, res){
+    if (req.user){
+        fetchTasks(req,res,next);
+    }
+
+    res.render('login',{user: req.user,tasks:usertasks});
   });
 
 router.post('/login',
   passport.authenticate('local', { failureRedirect: 'login'}),
   function(req, res, next) {
     // res.json(req.user);
-    res.render('profile',{user: req.user});
+
+    fetchTasks(req,res,next);
+    res.redirect('/users');
   });
 
 router.get('/logout',
@@ -45,14 +51,14 @@ router.get('/profile',
   loggedIn,
   function(req, res){
 
-      res.render('profile', { user: req.user });
+      res.render('user', { user: req.user });
   });
 
 router.get('/signup',
   function(req, res) {
     // If logged in, go to profile page
     if(req.user) {
-      res.render('profile',{user: req.user});
+      res.render('user',{user: req.user});
     }
     res.render('signup',{user: req.user});
   });
@@ -93,6 +99,7 @@ function fetchTasks(req, res, next){
                     usertasks = result.rows;
                 }else{
                     console.log("[INFO] No Tasks Where Found!");
+                    usertasks = [];
                 }
             });
         });
@@ -164,7 +171,8 @@ router.post('/addtask',
                 data[0].next();
                 console.log("[INFO] Created Task");
                 console.log("[INFO] Released Client Back Into Pool");
-                res.render('profile',{user: req.user});
+                fetchTasks(req,res,next)
+                res.redirect('/users');
 
             });
         },function(reason){

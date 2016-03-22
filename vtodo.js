@@ -12,8 +12,8 @@ var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
 var app = express();
 var session = require('express-session');
-require('dotenv').config();
 
+require('dotenv').config();
 passport.use(new LocalStrategy({
     usernameField: 'username',
     passwordField: 'password'
@@ -112,6 +112,5 @@ app.use(function(err, req, res, next) {
     error: {}
   });
 });
-
 
 module.exports = app;
