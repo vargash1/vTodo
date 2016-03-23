@@ -3,19 +3,10 @@ body {
   font-family: 'PT Sans', sans-serif;
   background-color: white;
 }
-
-a {
-  color: #00B7FF;
-}
 #myHeader {
     text-align: center;
     color: black;
     /*position : fixed;*/
-}
-#aPar {
-    color: black;
-    font-size: 12px;
-    text-align: center;
 }
 .button {
     background-color: black; /* Green */
