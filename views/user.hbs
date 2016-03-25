@@ -5,10 +5,10 @@
 {{/unless}}
 <br>
 {{#if tasks}}
-    <div class="grid" data-masonry='{ "columnWidth": 300, "gutter": 20,  "itemSelector": ".grid-item"}'>
+    <div class="grid" data-masonry='{ "columnWidth": 200, "gutter": 20,"isFitWidth": true,"itemSelector": ".grid-item"}'>
     {{#each tasks}}
         <div class="grid-item">
-            <blockquote class="note yellow">
+            <blockquote class="note notecolor">
                     <div class="titletext">
                         {{title}} <br>
                     </div>

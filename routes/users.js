@@ -17,26 +17,21 @@ router.get('/', function(req, res, next) {
 });
 
 router.get('/login',function(req, res){
-    if (req.user){
-        fetchTasks(req,res,next);
-    }
-
-    res.render('login',{user: req.user,tasks:usertasks});
+    // res.redirect('/users');
+    res.render('login',{user: req.user});
   });
 
 router.post('/login',
   passport.authenticate('local', { failureRedirect: 'login'}),
   function(req, res, next) {
-    // res.json(req.user);
-
-    fetchTasks(req,res,next);
-    res.redirect('/users');
+      fetchTasks(req,res,next);
+      res.render('user',{user: req.user, tasks:usertasks});
   });
 
 router.get('/logout',
   function(req, res){
     req.logout();
-    res.render('user',{user: req.user});
+    res.render('user',{user: req.user,tasks:[]});
   });
 
 function loggedIn(req, res, next) {
@@ -46,19 +41,21 @@ function loggedIn(req, res, next) {
       res.render('login',{ user: req.user });
   }
 }
-
-router.get('/profile',
+router.get('/user',
   loggedIn,
   function(req, res){
-
-      res.render('user', { user: req.user });
+      if (req.user){
+          fetchTasks(req,res,next);
+      }
+      res.render('user', { user: req.user,tasks:usertasks });
   });
 
 router.get('/signup',
   function(req, res) {
     // If logged in, go to profile page
     if(req.user) {
-      res.render('user',{user: req.user});
+        fetchTasks(req,res,next);
+        res.render('user',{user: req.user, tasks:usertasks});
     }
     res.render('signup',{user: req.user});
   });
