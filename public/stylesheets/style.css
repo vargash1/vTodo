@@ -50,12 +50,17 @@ a:link {
 a:visited {
     color: black;
 }
+blockquote {
+    padding: 10px 10px;
+    /* margin: 0 0 20px; */
+    margin-bottom: 10px;
+    border-left: 0;
+}
 .note {
     color: white;
     font-family: 'Roboto Slab', serif;
     position: relative;
-    display: block;
-    width: 200px;
+    /*display: block;*/
     font-size: 10px;
     box-shadow: 0 10px 10px 2px rgba(0,0,0,0.3);
 }
@@ -64,7 +69,7 @@ a:visited {
 }
 .note .author {
     display: block;
-    margin: 20px 0 0 0;
+    /*margin: 20px 0 0 0;*/
     text-align: right;
 }
 .centerform{
@@ -85,8 +90,8 @@ a:visited {
 }
 .grid-item {
   float: left;
-  width: 100px;
-  margin-bottom: 10px;
+  width: 200px;
+  /*margin-bottom: 2px;*/
 }
 .grid:after {
   content: '';
@@ -95,4 +100,23 @@ a:visited {
 }
 .grid-item--width2 {
     width: 200px;
+}
+.tooltip {
+    position: relative;
+    display: inline-block;
+    border-bottom: 1px dotted black;
+}
+.tooltip .tooltiptext {
+    visibility: hidden;
+    width: 120px;
+    background-color: black;
+    color: #fff;
+    text-align: center;
+    padding: 5px 0;
+    border-radius: 6px;
+    position: absolute;
+    z-index: 1;
+}
+.tooltip:hover .tooltiptext {
+    visibility: visible;
 }
