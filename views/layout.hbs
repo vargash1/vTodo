@@ -45,8 +45,9 @@
               </div>
               <div class="collapse navbar-collapse" id="myNavbar">
               <ul class="nav navbar-nav">
-                  <li class="active"><a href="/users"><i class="fa fa-home"></i></a></li>
-                </ul>
+                  <li><a href="/users"><i class="fa fa-home"></i></a></li>
+                  <li><a href="/users/settings"><i class="fa fa-wrench"></i></a></li>
+              </ul>
               <ul class="nav navbar-nav navbar-right">
                   {{#if user.username}}
                       <li><a href="/users/logout"><i class="fa fa-sign-out"></i> Log Out</a></li>
@@ -60,13 +61,10 @@
       </nav>
       <!-- NavBar Section  Fixed-->
       <br></br>
-      <!-- Le Buttons -->
-      <div class="container">
-          <h1 id="myHeader">
-            <i class="fa fa-sticky-note fa-spin"></i>
+      <h1 class="titleheader">
+          <i class="fa fa-sticky-note fa-spin"></i>
             vTask
-          </h1>
-      </div>
+      </h1>
       {{#if user.username}}
         {{#unless msg}}
         <div class = "wrapper">

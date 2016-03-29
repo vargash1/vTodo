@@ -9,29 +9,40 @@ require('dotenv').config();
 var usertasks;
 
 /* GET users listing. */
-router.get('/', function(req, res, next) {
-    if (req.user){
-        fetchTasks(req,res,next);
-    }
-    res.render('user',{user: req.user, tasks:usertasks});
-});
+router.get('/',
+    function(req, res, next) {
+        if (req.user){
+            fetchTasks(req,res,next);
+        }
+        res.render('user',{user: req.user, tasks:usertasks});
+    });
 
-router.get('/login',function(req, res){
-    // res.redirect('/users');
-    res.render('login',{user: req.user});
-  });
+router.get('/settings',
+    loggedIn,
+    function(req,res){
+        res.render('settings',{user: req.user, msg: "True"});
+    });
+
+router.get('/login',
+    function(req, res){
+        // res.redirect('/users');
+        res.render('login',{user: req.user});
+    });
 
 router.post('/login',
   passport.authenticate('local', { failureRedirect: 'login'}),
   function(req, res, next) {
-      fetchTasks(req,res,next);
+      if (req.user){
+          fetchTasks(req,res,next);
+      }
       res.render('user',{user: req.user, tasks:usertasks});
   });
 
 router.get('/logout',
   function(req, res){
     req.logout();
-    res.render('user',{user: req.user,tasks:[]});
+    usertasks = [];
+    res.render('user',{user: req.user});
   });
 
 function loggedIn(req, res, next) {
@@ -84,7 +95,7 @@ function fetchTasks(req, res, next){
             console.error("[INFO] Unable to Connect to Database");
         }
         console.log("[INFO] Querying Database");
-        client.query('SELECT * FROM notes WHERE username = $1',[req.user.username],
+        client.query('SELECT * FROM notes WHERE username = $1 ORDER BY noteid DESC',[req.user.username],
             function(err,result){
                 if (err){
                     console.error("[INFO] Unable to Query DB");
