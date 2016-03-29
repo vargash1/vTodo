@@ -326,7 +326,7 @@ router.post('/signup',
     });
 
 });
-// Handle new signup
+// Handle password change
 router.post('/chpasswd',
   function(req, res, next) {
 
@@ -408,8 +408,80 @@ router.post('/chpasswd',
                 res.render('user',{user: req.user,message: msg});
             });
     },function(reason){
-      console.log("[INFO] Unable to Create Account");req.logout();
-      res.render('signup',{message:reason})
+      console.log("[INFO] Unable to Change Passwords");
+      res.render('settings',{message:reason})
+    });
+
+});
+// Handle email change
+router.post('/chemail',
+  function(req, res, next) {
+     // Reject invalid passwords
+    if (!validEmail(req.body.email) || !validEmail(req.body.emailc)) {
+        console.log("[INFO] Invalid Email");
+        return res.render('chpasswd',{
+            message: "Invalid Email",
+            rules: "Please use an valid email!"
+
+        });
+    }
+    if(req.body.email != req.body.emailc){
+        console.log("[INFO] Passwords don't Match!");
+        return res.render('chemail',{
+            message: "Emails Don't Match!",
+            rules: [
+                {rule: "Emails Must Match!"}
+            ]
+        });
+    }
+    // Connect to database
+    var db = new Promise(function(resolve, reject) {
+    pg.connect(process.env.CONSTRING,function(err, client, next) {
+        console.log("[INFO] Connecting to Database");
+        if (err) {
+            reject(Error("Unable to connect to database"));
+        }
+        else {
+            resolve({'client':client,'next':next});
+        }
+      });
+  }).then(function(data) {
+      // Check if they're already a user
+      return new Promise(function(resolve, reject) {
+        console.log("[INFO] Querying DB for Username Availability");
+        data.client.query('SELECT * FROM users WHERE username=$1',[req.user.username],
+            function(err, result) {
+                if (err) {
+                    console.log(err);
+                    console.log("[INFO] Unable to Query DB");
+                    reject(Error("Unable to query database"));
+                }
+                else if (result.rows.length == 1){
+                    console.log("[INFO] Username Found, Proceeding to change email");
+                    resolve(data);
+                }
+                else {
+                    data.next();
+                    console.log("[INFO] Released Client Back Into Pool");
+                    console.log("[INFO] User with Username Does Not Exist");
+                    reject(Error(" User with Username Does Not Exist, Unexpected Error"));
+                }
+            });
+        });
+    });
+    Promise.all([db]).then(function(data) {
+        console.log("[INFO] Querying Database");
+        data[0].client.query('UPDATE users SET email=$1 WHERE username=$2',[req.body.email,req.user.username],
+            function(err, result) {
+                data[0].next();
+                console.log("[INFO] Updated Account Info");
+                console.log("[INFO] Released Client Back Into Pool");
+                msg = 'Email has been Successfully Changed';
+                res.render('user',{user: req.user,message: msg});
+            });
+    },function(reason){
+      console.log("[INFO] Unable to Change Email");req.logout();
+      res.render('settings',{message:reason})
     });
 
 });
