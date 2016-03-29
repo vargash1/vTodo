@@ -23,6 +23,21 @@ router.get('/settings',
         res.render('settings',{user: req.user, msg: "True"});
     });
 
+// change user email
+router.get('/chemail',
+    loggedIn,
+    function(req,res){
+        res.render('chemail',{user: req.user, msg: "True"});
+    });
+
+// change password
+router.get('/chpasswd',
+    loggedIn,
+    function(req,res){
+        res.render('chpasswd',{user: req.user, msg: "True"});
+    });
+
+
 router.get('/login',
     function(req, res){
         // res.redirect('/users');
@@ -307,6 +322,93 @@ router.post('/signup',
             });
     },function(reason){
       console.log("[INFO] Unable to Create Account");
+      res.render('signup',{message:reason})
+    });
+
+});
+// Handle new signup
+router.post('/chpasswd',
+  function(req, res, next) {
+
+    // Reject weak passwords
+    if (!validPassword(req.body.password) || !validPassword(req.body.passwordc)) {
+        console.log("[INFO] Invalid Password");
+        return res.render('chpasswd',{
+            message: "Invalid Password!",
+            rules: [
+                {rule: "Password must be at least 8 characters long"},
+                {rule: "Password must contain at least one Lowercase letter"},
+                {rule: "Password must contain at least one Uppercase letter"},
+                {rule: "Password must contain at least one Number"}
+            ]
+        });
+    }
+    if(req.body.password != req.body.passwordc){
+        console.log("[INFO] Passwords don't Match!");
+        return res.render('chpasswd',{
+            message: "Passwords Don't Match!",
+            rules: [
+                {rule: "Passwords Must Match!"}
+            ]
+        });
+    }
+
+    // Generate a hashed password
+    var hashedPassword = new Promise(function(resolve, reject){
+      var salt = bcrypt.genSaltSync(10);
+      console.log("[INFO] Hash Passwords");
+      resolve(bcrypt.hashSync(req.body.password, salt));
+    });
+
+    // Connect to database
+    var db = new Promise(function(resolve, reject) {
+    pg.connect(process.env.CONSTRING,function(err, client, next) {
+        console.log("[INFO] Connecting to Database");
+        if (err) {
+            reject(Error("Unable to connect to database"));
+        }
+        else {
+            resolve({'client':client,'next':next});
+        }
+      });
+  }).then(function(data) {
+      // Check if they're already a user
+      return new Promise(function(resolve, reject) {
+        console.log("[INFO] Querying DB for Username Availability");
+        data.client.query('SELECT * FROM users WHERE username=$1',[req.user.username],
+            function(err, result) {
+                if (err) {
+                    console.log(err);
+                    console.log("[INFO] Unable to Query DB");
+                    reject(Error("Unable to query database"));
+                }
+                else if (result.rows.length == 1){
+                    console.log("[INFO] Username Found, Proceeding to change Password");
+                    resolve(data);
+                }
+                else {
+                    data.next();
+                    console.log("[INFO] Released Client Back Into Pool");
+                    console.log("[INFO] User with Username Does Not Exist");
+                    reject(Error(" User with Username Does Not Exist, Unexpected Error"));
+                }
+            });
+        });
+    });
+    Promise.all([hashedPassword, db]).then(function(data) {
+        console.log("[INFO] Querying Database");
+        data[1].client.query('UPDATE users SET password=$1 WHERE username=$2',[data[0],req.user.username],
+            function(err, result) {
+                data[1].next();
+                console.log("[INFO] Updated Account Info");
+                console.log("[INFO] Released Client Back Into Pool");
+                msg = 'Password has been Successfully Changed';
+                req.logout();
+                usertasks = [];
+                res.render('user',{user: req.user,message: msg});
+            });
+    },function(reason){
+      console.log("[INFO] Unable to Create Account");req.logout();
       res.render('signup',{message:reason})
     });
 

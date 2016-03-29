@@ -3,6 +3,11 @@
         Welcome to vTask, please sign in or create an account!
     </div>
 {{/unless}}
+{{#if message}}
+    <div class = "divform">
+        {{message}}
+    </div>
+{{/if}}
 <br>
 {{#if tasks}}
     <div class="grid" data-masonry='{ "columnWidth": 200, "gutter":10,"isFitWidth": true,"itemSelector": ".grid-item"}'>

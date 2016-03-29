@@ -46,7 +46,9 @@
               <div class="collapse navbar-collapse" id="myNavbar">
               <ul class="nav navbar-nav">
                   <li><a href="/users"><i class="fa fa-home"></i></a></li>
-                  <li><a href="/users/settings"><i class="fa fa-wrench"></i></a></li>
+                  {{#if user.username}}
+                    <li><a href="/users/settings"><i class="fa fa-wrench"></i></a></li>
+                  {{/if}}
               </ul>
               <ul class="nav navbar-nav navbar-right">
                   {{#if user.username}}
