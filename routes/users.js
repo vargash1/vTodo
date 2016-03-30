@@ -5,8 +5,6 @@ var pg = require('pg')
 var bcrypt = require('bcryptjs');
 var Promise = require('promise');
 require('dotenv').config();
-// untill then...
-//var usertasks;
 
 /* GET users listing. */
 router.get('/',
@@ -25,11 +23,12 @@ router.get('/settings',
     loggedIn,
     function(req,res,next){
         console.log(req.user);
-        fetchTasks(req,res,function(usertasks){
+        fetchInfo(req,res,function(dbdata){
+            console.log(dbdata);
             res.render('settings',{
                 user: req.user,
                 msg: "True",
-                numtasks: usertasks.length
+                numtasks: dbdata.length
             });
         });
     });
@@ -60,7 +59,7 @@ router.post('/login',
       if (req.user){
           fetchTasks(req,res,function(usertasks) {
               res.render('user',{user: req.user, tasks:usertasks});
-          });
+        });
       }
   });
 
@@ -134,7 +133,6 @@ function fetchTasks(req, res, next){
 
             }else{
                 console.log("[INFO] No Tasks Where Found!");
-//                usertasks = [];
                 next([]);
             }
         });
@@ -496,23 +494,23 @@ router.post('/chemail',
       res.render('settings',{message:reason})
     });
 });
-function fetchEmail(req, res, next){
+function fetchInfo(req, res, next){
     pg.connect(process.env.CONSTRING,function(err, client, done){
         console.log("[INFO] Connecting to Database");
         if (err){
             reject(Error("Unable to connect to database"));
         }
         else {
-            client.query('SELECT email FROM users WHERE username=$1',[req.user.username],
+            client.query('SELECT * FROM users,notes WHERE users.username=$1 AND notes.username=$1',[req.user.username],
             function(err,result){
                 if (err){
                     console.error("[INFO] Unable to Query DB");
                 }
-                else if (result.rows.length == 1){
+                else if (result.rows.length >= 0){
                     done();
                     console.log("[INFO] Released Client Back Into Pool");
                     console.log("[INFO] User's Email Found");
-                    kek.push(result.rows);
+                    next(result.rows);
                 }
                 else{
                     console.log("[INFO] Unexpected Error");

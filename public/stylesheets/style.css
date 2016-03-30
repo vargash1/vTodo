@@ -59,7 +59,7 @@ blockquote {
     border-left: 0;
 }
 .note {
-    color: white;
+    color: black;
     font-family: 'Roboto Slab', serif;
     position: relative;
     /*display: block;*/
@@ -85,7 +85,7 @@ blockquote {
     text-align: center;
 }
 .notecolor {
-    background: black;
+    background: white;
 }
 .grid{
     margin: 0 auto;
