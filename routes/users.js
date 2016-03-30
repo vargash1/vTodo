@@ -24,12 +24,15 @@ router.get('/settings',
     function(req,res,next){
         console.log(req.user);
         fetchInfo(req,res,function(dbdata){
-            console.log(dbdata);
-            res.render('settings',{
-                user: req.user,
-                msg: "True",
-                numtasks: dbdata.length
-            });
+            if( dbdata[0] != null && dbdata[0] != undefined){
+                console.log(dbdata[0].email);
+                res.render('settings',{
+                    user: req.user,
+                    msg: "True",
+                    userdata: dbdata[0],
+                    numtasks: dbdata.length
+                });
+            }
         });
     });
 // change user email
