@@ -6,23 +6,33 @@ var bcrypt = require('bcryptjs');
 var Promise = require('promise');
 require('dotenv').config();
 // untill then...
-var usertasks;
+//var usertasks;
 
 /* GET users listing. */
 router.get('/',
     function(req, res, next) {
         if (req.user){
-            fetchTasks(req,res,next);
+            fetchTasks(req,res,function(usertasks) {
+                res.render('user',{user: req.user,tasks:usertasks});
+            });
+            return;
+        } else {
+            res.render('user',{user: req.user});
         }
-        res.render('user',{user: req.user, tasks:usertasks});
     });
 
 router.get('/settings',
     loggedIn,
-    function(req,res){
-        res.render('settings',{user: req.user, msg: "True"});
+    function(req,res,next){
+        console.log(req.user);
+        fetchTasks(req,res,function(usertasks){
+            res.render('settings',{
+                user: req.user,
+                msg: "True",
+                numtasks: usertasks.length
+            });
+        });
     });
-
 // change user email
 router.get('/chemail',
     loggedIn,
@@ -48,9 +58,10 @@ router.post('/login',
   passport.authenticate('local', { failureRedirect: 'login'}),
   function(req, res, next) {
       if (req.user){
-          fetchTasks(req,res,next);
+          fetchTasks(req,res,function(usertasks) {
+              res.render('user',{user: req.user, tasks:usertasks});
+          });
       }
-      res.render('user',{user: req.user, tasks:usertasks});
   });
 
 router.get('/logout',
@@ -105,28 +116,29 @@ function validTaskBody(tbody){
 // Fetches all tasks in database that belong to the user
 function fetchTasks(req, res, next){
     console.log("[INFO] Connecting to Database");
-    pg.connect(process.env.CONSTRING, function(err,client,next){
+    pg.connect(process.env.CONSTRING, function(err,client,done){
         if(err){
             console.error("[INFO] Unable to Connect to Database");
         }
         console.log("[INFO] Querying Database");
         client.query('SELECT * FROM notes WHERE username = $1 ORDER BY noteid DESC',[req.user.username],
-            function(err,result){
-                if (err){
-                    console.error("[INFO] Unable to Query DB");
-                }
-                else if (result.rows.length > 0){
-                    next();
-                    console.log("[INFO] Released Client Back Into Pool");
-                    console.log("[INFO] User's Tasks Found");
-                    usertasks = result.rows;
-                }else{
-                    console.log("[INFO] No Tasks Where Found!");
-                    usertasks = [];
-                }
-            });
-        });
+        function(err,result){
+            if (err){
+                console.error("[INFO] Unable to Query DB");
+            }
+            else if (result.rows.length > 0){
+                done();
+                console.log("[INFO] Released Client Back Into Pool");
+                console.log("[INFO] User's Tasks Found");
+                next(result.rows);
 
+            }else{
+                console.log("[INFO] No Tasks Where Found!");
+//                usertasks = [];
+                next([]);
+            }
+        });
+    });
 }
 // Adds a task to the Database
 router.post('/addtask',
@@ -317,7 +329,7 @@ router.post('/signup',
                 data[1].next();
                 console.log("[INFO] Created New Account!");
                 console.log("[INFO] Released Client Back Into Pool");
-                msg = 'Successful Signup, Please sign in to your account '.concat([req.body.username]);
+                var msg = 'Successful Signup, Please sign in to your account '.concat([req.body.username]);
                 res.render('login',{message: msg});
             });
     },function(reason){
@@ -476,14 +488,38 @@ router.post('/chemail',
                 data[0].next();
                 console.log("[INFO] Updated Account Info");
                 console.log("[INFO] Released Client Back Into Pool");
-                msg = 'Email has been Successfully Changed';
+                var msg = 'Email has been Successfully Changed';
                 res.render('user',{user: req.user,message: msg});
             });
     },function(reason){
       console.log("[INFO] Unable to Change Email");req.logout();
       res.render('settings',{message:reason})
     });
-
 });
+function fetchEmail(req, res, next){
+    pg.connect(process.env.CONSTRING,function(err, client, done){
+        console.log("[INFO] Connecting to Database");
+        if (err){
+            reject(Error("Unable to connect to database"));
+        }
+        else {
+            client.query('SELECT email FROM users WHERE username=$1',[req.user.username],
+            function(err,result){
+                if (err){
+                    console.error("[INFO] Unable to Query DB");
+                }
+                else if (result.rows.length == 1){
+                    done();
+                    console.log("[INFO] Released Client Back Into Pool");
+                    console.log("[INFO] User's Email Found");
+                    kek.push(result.rows);
+                }
+                else{
+                    console.log("[INFO] Unexpected Error");
+                }
+            });
+        }
+    });
+}
 
 module.exports = router;
