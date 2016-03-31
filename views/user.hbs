@@ -3,9 +3,8 @@
 @Date:   Wednesday, March 30th 2016, 5:42:52 pm
 @Email:  vargash1@wit.edu
 @Last modified by:   vargash1
-@Last modified time: Wednesday, March 30th 2016, 10:44:44 pm
+@Last modified time: Wednesday, March 30th 2016, 11:29:23 pm
 -->
-
 {{#unless user.username}}
     <div class = "divform">
         Welcome to vTask, please sign in or create an account!
@@ -25,7 +24,7 @@
                     <div class="titletext">
                         {{title}}
                         <div class="noteoptions">
-                            <i class="fa fa-wrench fa-fw"></i>
+                            <a href="#" data-toggle="modal" data-target="#myModal"><i class="fa fa-wrench fa-fw"></i></a>
                             <i class="fa fa-times fa-fw"></i>
                         </div>
                     </div>
@@ -37,3 +36,22 @@
     {{/each}}
     </div>
 {{/if}}
+
+<!-- Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">Modal title</h4>
+      </div>
+      <div class="modal-body">
+        ...
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>

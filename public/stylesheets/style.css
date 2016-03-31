@@ -3,7 +3,7 @@
 * @Date:   Wednesday, March 30th 2016, 5:39:29 pm
 * @Email:  vargash1@wit.edu
 * @Last modified by:   vargash1
-* @Last modified time: Wednesday, March 30th 2016, 10:43:49 pm
+* @Last modified time: Wednesday, March 30th 2016, 10:55:55 pm
 */
 
 body {
@@ -140,4 +140,19 @@ blockquote {
 }
 .fa-times:hover{
     color: red;
+}
+.fa-exclamation-triangle{
+    color:red;
+}
+.fa-exclamation-triangle:hover{
+    color:black;
+}
+.fa-key:hover{
+    color:green;
+}
+.fa-envelope-o:hover{
+    color: green;
+}
+.fa-check-square-o:hover{
+    color:green;
 }

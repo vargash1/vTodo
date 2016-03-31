@@ -3,7 +3,7 @@
 * @Date:   Wednesday, March 30th 2016, 5:34:31 pm
 * @Email:  vargash1@wit.edu
 * @Last modified by:   vargash1
-* @Last modified time: Wednesday, March 30th 2016, 9:54:56 pm
+* @Last modified time: Wednesday, March 30th 2016, 11:02:26 pm
 */
 
 var express = require('express');
@@ -43,6 +43,7 @@ router.get('/settings',
             }
         });
     });
+    
 // change user email
 router.get('/chemail',
     loggedIn,
