@@ -1,11 +1,3 @@
-/**
-* @Author: Vargas Hector <vargash1>
-* @Date:   Wednesday, March 30th 2016, 5:39:29 pm
-* @Email:  vargash1@wit.edu
-* @Last modified by:   vargash1
-* @Last modified time: Thursday, March 31st 2016, 2:16:45 am
-*/
-
 body {
   padding: 50px;
   font-family: 'PT Sans', sans-serif;
@@ -159,3 +151,27 @@ blockquote {
 .fa-floppy-o:hover{
     color:green;
 }
+.modal-header{
+    color: white;
+    background: black;
+    text-align: center;
+}
+.close{
+    color: white;
+    background-color: white;
+    cursor: pointer;
+    text-shadow: none;
+}
+.close:hover{
+    color:red;
+    -webkit-box-shadow: none;
+	-moz-box-shadow: none;
+	box-shadow: none;
+    text-shadow: none;
+}
+/*.modal-content{
+    -webkit-box-shadow:none;
+    -moz-box-shadow:none;
+    -o-box-shadow:none;
+    box-shadow: none:
+}*/

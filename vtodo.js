@@ -1,3 +1,11 @@
+/**
+* @Author: Vargas Hector <vargash1>
+* @Date:   Monday, March 28th 2016, 3:29:51 pm
+* @Email:  vargash1@wit.edu
+* @Last modified by:   vargash1
+* @Last modified time: Thursday, March 31st 2016, 6:32:34 pm
+*/
+
 var express = require('express');
 var path = require('path');
 var logger = require('morgan');
