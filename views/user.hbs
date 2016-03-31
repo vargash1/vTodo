@@ -1,3 +1,11 @@
+<!--
+@Author: Vargas Hector <vargash1>
+@Date:   Wednesday, March 30th 2016, 5:42:52 pm
+@Email:  vargash1@wit.edu
+@Last modified by:   vargash1
+@Last modified time: Wednesday, March 30th 2016, 10:44:44 pm
+-->
+
 {{#unless user.username}}
     <div class = "divform">
         Welcome to vTask, please sign in or create an account!
@@ -15,8 +23,13 @@
         <div class="grid-item">
             <blockquote class="note notecolor">
                     <div class="titletext">
-                        {{title}} <br>
+                        {{title}}
+                        <div class="noteoptions">
+                            <i class="fa fa-wrench fa-fw"></i>
+                            <i class="fa fa-times fa-fw"></i>
+                        </div>
                     </div>
+                    <br>
                     {{taskbody}} <br>
                     <i class="fa fa-clock-o"></i> {{datedue}} {{timedue}} <br>
             </blockquote>

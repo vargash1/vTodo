@@ -1,3 +1,11 @@
+/**
+* @Author: Vargas Hector <vargash1>
+* @Date:   Wednesday, March 30th 2016, 5:34:31 pm
+* @Email:  vargash1@wit.edu
+* @Last modified by:   vargash1
+* @Last modified time: Wednesday, March 30th 2016, 9:54:56 pm
+*/
+
 var express = require('express');
 var router = express.Router();
 var passport = require('passport');
@@ -88,7 +96,11 @@ router.get('/user',
       }
       res.render('user', { user: req.user,tasks:usertasks });
   });
-
+router.get('/modifytask',
+    loggedIn,
+    function(req,res,next){
+        res.render('user',{})
+    });
 router.get('/signup',
   function(req, res) {
     // If logged in, go to profile page
@@ -522,5 +534,80 @@ function fetchInfo(req, res, next){
         }
     });
 }
+// Adds a task to the Database
+router.post('/modifytask',
+    function(req, res, next){
+
+        // Reject invalid task title
+        if (!validTaskTitle(req.body.tasktitle)) {
+            console.log("[INFO] Invalid Task Title!");
+            return res.render('addtask',{
+                message: "Invalid Task Title!",
+                rules: "Task Title must be at least 3 characters long!"
+            });
+        }
+        //Reject invalid task body
+        if (!validTaskBody(req.body.taskbody)){
+            console.log("[INFO] Invalid Task Body!");
+            return res.render('addtask',{
+                message: "Invalid Task Body!",
+                rules: "Task Body must compose of at least 3 characters!"
+            });
+        }
+
+        var db = new Promise(function(resolve,reject){
+        console.log("[INFO] Connecting to Database");
+        pg.connect(process.env.CONSTRING,function(err, client, next){
+            if(err){
+                reject(Error("Unable to Connect to DB"));
+            }
+            else{
+                resolve({'client':client,'next':next});
+            }
+        });
+        }).then(function(data) {
+            return new Promise(function(resolve,reject){
+                console.log("[INFO] Querying Database");
+                data.client.query('SELECT * FROM notes WHERE title=$1 AND username=$2',[req.body.tasktitle,req.user.username],
+                function(err,result){
+                    if (err){
+                        console.log(err);
+                        console.error("[INFO] Unable to Query DB");
+                        reject(Error("Unable to Query DB"));
+                    }
+                    else if (result.rows.length === 0){
+                        console.log("[INFO] Task with Title already exists");
+                        console.log("[INFO] Released Client Back Into Pool");
+                        resolve(data);
+                    }
+                    else{
+                        console.log("[INFO] No Task with title name found");
+                        reject(Error("Task with Title already exists!"));
+                        data.next();
+                    }
+                });
+            });
+        });
+        Promise.all([db]).then(function(data) {
+            console.log("[INFO] Querying Database");
+            data[0].client.query('INSERT INTO notes (username,title,datedue,timedue,taskbody) VALUES($1,$2,$3,$4,$5)',
+            [req.user.username, req.body.tasktitle, req.body.datedue, req.body.timedue, req.body.taskbody],
+            function(err, result) {
+                if(err){
+                    console.log("[INFO] Unable To Insert Note into Database");
+                    console.error(err);
+                }
+                data[0].next();
+                console.log("[INFO] Created Task");
+                console.log("[INFO] Released Client Back Into Pool");
+                fetchTasks(req,res,next)
+                res.redirect('/users');
+
+            });
+        },function(reason){
+            console.log("[INFO] Unable to Create Task");
+            res.render('addtask',{message:reason})
+        });
+});
 
 module.exports = router;
