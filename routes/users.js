@@ -3,7 +3,7 @@
 * @Date:   Wednesday, March 30th 2016, 5:34:31 pm
 * @Email:  vargash1@wit.edu
 * @Last modified by:   vargash1
-* @Last modified time: Thursday, March 31st 2016, 11:35:38 pm
+* @Last modified time: Friday, April 1st 2016, 2:16:03 pm
 */
 
 var express = require('express');
@@ -628,7 +628,67 @@ router.post('/modifytask',
         },function(reason){
             console.log("[INFO] Unable to Modify Task");
             fetchTasks(req,res,function(usertasks){
-                res.render('user',{ user: req.user,message:reason, tasks:usertasks });
+                res.render('user',{ user: req.user, tasks:usertasks });
+            });
+        });
+});
+// Deletes an existing task in the Database
+router.post('/deletetask',
+    function(req, res, next){
+
+        var db = new Promise(function(resolve,reject){
+        console.log("[INFO] Connecting to Database");
+        pg.connect(process.env.CONSTRING,function(err, client, next){
+            if(err){
+                reject(Error("Unable to Connect to DB"));
+            }
+            else{
+                resolve({'client':client,'next':next});
+            }
+        });
+        }).then(function(data) {
+            return new Promise(function(resolve,reject){
+                console.log("[INFO] Querying Database");
+                data.client.query('SELECT * FROM notes WHERE title=$1 AND username=$2',[req.body.tasktitle,req.user.username],
+                function(err,result){
+                    if (err){
+                        console.log(err);
+                        console.error("[INFO] Unable to Query DB");
+                        reject(Error("Unable to Query DB"));
+                    }
+                    else if (result.rows.length === 1){
+                        console.log("[INFO] Task Found");
+                        console.log("[INFO] Released Client Back Into Pool");
+                        resolve(data);
+                    }
+                    else{
+                        console.log("[INFO] Task Title Does Not Exist");
+                        reject(Error("Unexpected Error: Task Title Does Not Exist"));
+                        data.next();
+                    }
+                });
+            });
+        });
+        Promise.all([db]).then(function(data) {
+            console.log("[INFO] Updating Task Info");
+            data[0].client.query('DELETE FROM notes WHERE title=$1 AND username=$2',
+            [req.body.tasktitle,req.user.username],
+            function(err, result) {
+                if(err){
+                    console.log("[INFO] Unable To Delete Note from Database");
+                    console.error(err);
+                }
+                data[0].next();
+                console.log("[INFO] Deleted Task!");
+                console.log("[INFO] Released Client Back Into Pool");
+                fetchTasks(req,res,function(usertasks){
+                        res.render('user',{ user:req.user, tasks:usertasks });
+                });
+            });
+        },function(reason){
+            console.log("[INFO] Unable to Delete Task!");
+            fetchTasks(req,res,function(usertasks){
+                res.render('user',{ user: req.user, tasks:usertasks });
             });
         });
 });
