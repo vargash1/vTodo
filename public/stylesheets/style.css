@@ -23,7 +23,7 @@ body {
     -webkit-transition-duration: 0.4s; /* Safari */
     transition-duration: 0.4s;
 }
-.buttonopt {
+.buttonoptMod {
     background-color: white;
     border: none;
     color: black;
@@ -34,10 +34,29 @@ body {
     -webkit-transition-duration: 0.4s; /* Safari */
     transition-duration: 0.4s;
 }
-.buttonopt:hover {
+.buttonoptDel {
+    background-color: white;
+    border: none;
+    color: black;
+    text-align: center;
+    text-decoration: none;
+    font-size: 10px;
+    cursor: pointer;
+    -webkit-transition-duration: 0.4s; /* Safari */
+    transition-duration: 0.4s;
+}
+.buttonoptMod:hover {
     box-shadow: 0 4px 8px 0 rgba(0,0,0,0.24),0 4px 8px 0 rgba(0,0,0,0.19);
 }
-.buttonopt:active {
+.buttonoptMod:active {
+    transform: translate(0px,1px);
+    -webkit-transform: translate(0px,1px);
+    border-bottom: 1px solid;
+}
+.buttonoptDel:hover {
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.24),0 4px 8px 0 rgba(0,0,0,0.19);
+}
+.buttonoptDel:active {
     transform: translate(0px,1px);
     -webkit-transform: translate(0px,1px);
     border-bottom: 1px solid;

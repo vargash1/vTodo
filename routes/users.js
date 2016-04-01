@@ -3,7 +3,7 @@
 * @Date:   Wednesday, March 30th 2016, 5:34:31 pm
 * @Email:  vargash1@wit.edu
 * @Last modified by:   vargash1
-* @Last modified time: Thursday, March 31st 2016, 10:53:26 pm
+* @Last modified time: Thursday, March 31st 2016, 11:35:38 pm
 */
 
 var express = require('express');
@@ -561,37 +561,19 @@ router.post('/modifytask',
         // Reject invalid task title
         if (!validTaskTitle(req.body.newtasktitle)) {
             console.log("[INFO] Invalid Task Title!");
-            return res.render('user',{
-                user : req.user,
-                mod: [
-                    {mods: "Invalid Task Title!"},
-                    {mods: "Task Title must be at least 3 characters long!"}
-                ]
-            });
+            return res.redirect('/users');
 
         }
         //Reject invalid task body
         if (!validTaskBody(req.body.taskbody)){
             console.log("[INFO] Invalid Task Body!");
-            return res.render('user',{
-                user: req.user,
-                mod: [
-                    {mods: "Invalid Task Body!"},
-                    {mods: "Task Body must be at least 3 characters long!"}
-                ]
-            });
+            return res.redirect('/users');
         }
 
         //Reject invalid task date and time
         if (!validDate(req.body.datedue) || !validTime(req.body.timedue)){
             console.log("[INFO] Invalid Date/Time!");
-            return res.render('user',{
-                user: req.user,
-                mod: [
-                    {mods: "Invalid Task Time/Date!"},
-                    {mods: "Please Check Time and Date are Valid!"}
-                ]
-            });
+            return res.redirect('/users');
         }
 
         var db = new Promise(function(resolve,reject){
