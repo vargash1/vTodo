@@ -3,7 +3,7 @@
 * @Date:   Wednesday, March 30th 2016, 5:34:31 pm
 * @Email:  vargash1@wit.edu
 * @Last modified by:   vargash1
-* @Last modified time: Thursday, March 31st 2016, 7:49:59 pm
+* @Last modified time: Thursday, March 31st 2016, 10:53:26 pm
 */
 
 var express = require('express');
@@ -21,9 +21,8 @@ router.get('/',
             fetchTasks(req,res,function(usertasks) {
                 res.render('user',{user: req.user,tasks:usertasks});
             });
-            return;
         } else {
-            res.render('user',{user: req.user});
+            res.render('user',{user: req.user, tasks:[]});
         }
     });
 
@@ -50,17 +49,14 @@ router.get('/chemail',
         res.render('chemail',{user: req.user, msg: "True"});
     });
 
-// change password
 router.get('/chpasswd',
     loggedIn,
     function(req,res){
         res.render('chpasswd',{user: req.user, msg: "True"});
     });
 
-
 router.get('/login',
     function(req, res){
-        // res.redirect('/users');
         res.render('login',{user: req.user});
     });
 
@@ -77,8 +73,7 @@ router.post('/login',
 router.get('/logout',
   function(req, res){
     req.logout();
-    usertasks = [];
-    res.render('user',{user: req.user});
+    res.render('user',{user: req.user, tasks:[]});
   });
 
 function loggedIn(req, res, next) {
@@ -88,14 +83,15 @@ function loggedIn(req, res, next) {
     else{
         res.render('login',{ user: req.user });
     }
-    res.render('user', { user: req.user });
  }
 
 router.get('/signup',
   function(req, res) {
     // If logged in, go to profile page
     if(req.user) {
-        res.render('user',{user: req.user});
+        fetchTasks(req,res,function(usertasks){
+            res.render('user',{user: req.user, tasks:usertasks});
+        });
     }
     res.render('signup',{user: req.user});
   });
@@ -106,6 +102,15 @@ router.get('/addtask',
         res.render('addtask',{user: req.user, msg: "True"});
     });
 
+router.get('/modifytask',
+    loggedIn,
+    function(req,res){
+        fetchTasks(req,res,function(usertasks){
+            res.render('user',{user: req.user, tasks:usertasks});
+        });
+    });
+
+// checking for valid tasks
 function validTaskTitle(ttitle){
     var modtitle = ttitle.trim();
     return  modtitle !== '' && modtitle.length >= 3;
@@ -114,6 +119,16 @@ function validTaskTitle(ttitle){
 function validTaskBody(tbody){
     var modbody = tbody.trim();
     return modbody !== '' && modbody.length >= 3;
+}
+
+function validTime(ttime){
+    var modtime = ttime.trim();
+    return modtime !== '';
+}
+
+function validDate(tdate){
+    var moddate = tdate.trim();
+    return moddate !== '';
 }
 
 // Fetches all tasks in database that belong to the user
@@ -161,6 +176,15 @@ router.post('/addtask',
                 rules: "Task Body must compose of at least 3 characters!"
             });
         }
+        //Reject invalid task date and time
+        if (!validDate(req.body.datedue) || !validTime(req.body.timedue)){
+            console.log("[INFO] Invalid Date/Time!");
+            return res.render('addtask',{
+                    message: "Invalid Task Time/Date!",
+                    rules: "Please Make Sure Task Time/Date is Valid!"
+                });
+        }
+
 
         var db = new Promise(function(resolve,reject){
         console.log("[INFO] Connecting to Database");
@@ -207,13 +231,13 @@ router.post('/addtask',
                 data[0].next();
                 console.log("[INFO] Created Task");
                 console.log("[INFO] Released Client Back Into Pool");
-                fetchTasks(req,res,next)
-                res.redirect('/users');
-
+                fetchTasks(req,res,function(usertasks){
+                    res.render('user',{user:req.user,tasks:usertasks});
+                });
             });
         },function(reason){
             console.log("[INFO] Unable to Create Task");
-            res.render('addtask',{message:reason})
+            res.render('addtask',{user : req.user,message:reason})
         });
 });
 
@@ -262,7 +286,10 @@ router.post('/signup',
         console.log("[INFO] Invalid Email");
         return res.render('signup',{
             message: "Invalid Email!",
-            rules: "Please use an valid email!"
+            rules:[
+                {rule: "Please use an valid email!"},
+                {rule: "Email must have a valid domain"}
+            ]
         });
     }
 
@@ -418,12 +445,11 @@ router.post('/chpasswd',
                 console.log("[INFO] Released Client Back Into Pool");
                 msg = 'Password has been Successfully Changed. You must now log in.';
                 req.logout();
-                usertasks = [];
-                res.render('user',{user: req.user,message: msg});
+                res.render('user',{message: msg, tasks:[]});
             });
     },function(reason){
       console.log("[INFO] Unable to Change Passwords");
-      res.render('settings',{message:reason})
+      res.render('settings',{user : req.user,message:reason})
     });
 
 });
@@ -471,7 +497,7 @@ router.post('/chemail',
                     console.log("[INFO] Unable to Query DB");
                     reject(Error("Unable to query database"));
                 }
-                else if (result.rows.length == 1){
+                else if (result.rows.length === 1){
                     console.log("[INFO] Username Found, Proceeding to change email");
                     resolve(data);
                 }
@@ -492,7 +518,9 @@ router.post('/chemail',
                 console.log("[INFO] Updated Account Info");
                 console.log("[INFO] Released Client Back Into Pool");
                 var msg = 'Email has been Successfully Changed';
-                res.render('user',{user: req.user,message: msg});
+                fetchTasks(req,res,function(usertasks){
+                    res.render('user',{user: req.user, message: msg, tasks: usertasks});
+                });
             });
     },function(reason){
       console.log("[INFO] Unable to Change Email");
@@ -534,19 +562,34 @@ router.post('/modifytask',
         if (!validTaskTitle(req.body.newtasktitle)) {
             console.log("[INFO] Invalid Task Title!");
             return res.render('user',{
+                user : req.user,
                 mod: [
                     {mods: "Invalid Task Title!"},
                     {mods: "Task Title must be at least 3 characters long!"}
                 ]
             });
+
         }
         //Reject invalid task body
         if (!validTaskBody(req.body.taskbody)){
             console.log("[INFO] Invalid Task Body!");
             return res.render('user',{
+                user: req.user,
                 mod: [
                     {mods: "Invalid Task Body!"},
-                    {mods: "Task Body must be at least 3 characters long!"},
+                    {mods: "Task Body must be at least 3 characters long!"}
+                ]
+            });
+        }
+
+        //Reject invalid task date and time
+        if (!validDate(req.body.datedue) || !validTime(req.body.timedue)){
+            console.log("[INFO] Invalid Date/Time!");
+            return res.render('user',{
+                user: req.user,
+                mod: [
+                    {mods: "Invalid Task Time/Date!"},
+                    {mods: "Please Check Time and Date are Valid!"}
                 ]
             });
         }
@@ -596,12 +639,15 @@ router.post('/modifytask',
                 data[0].next();
                 console.log("[INFO] Updated Task!");
                 console.log("[INFO] Released Client Back Into Pool");
-                res.render('user',{ user:req.user });
-
+                fetchTasks(req,res,function(usertasks){
+                        res.render('user',{ user:req.user, tasks:usertasks });
+                });
             });
         },function(reason){
             console.log("[INFO] Unable to Modify Task");
-            res.render('user',{message:"reason"})
+            fetchTasks(req,res,function(usertasks){
+                res.render('user',{ user: req.user,message:reason, tasks:usertasks });
+            });
         });
 });
 
