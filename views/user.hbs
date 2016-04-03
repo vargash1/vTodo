@@ -3,7 +3,7 @@
 @Date:   Wednesday, March 30th 2016, 5:42:52 pm
 @Email:  vargash1@wit.edu
 @Last modified by:   vargash1
-@Last modified time: Sunday, April 3rd 2016, 2:03:44 pm
+@Last modified time: Sunday, April 3rd 2016, 6:12:50 pm
 -->
 {{#unless user.username}}
     <div class = "divform">
@@ -81,7 +81,7 @@
                     <textarea name="taskbody" rows="10" cols="40" id="bodyID" wrap="hard">
                     </textarea><br>
                     <button type="submit" class="button button-modsub">
-                        <i class="fa fa-archive fa-fw"></i>  Modify Task
+                        <i class="zmdi zmdi-assignment"></i>  Modify Task
                     </button>
                 </form>
             </div>
@@ -110,7 +110,7 @@
                 <i class="fa fa-exclamation-triangle fa-fw"></i> This cannot be undone!<br>
                 <form class = "centerform" method="post" action="/users/deletetask">
                     <input type="hidden" name="dbid" id="taskID" value="" readonly/>
-                    <input type="text" name="tasktitle" id="titleID" readonly/><br><br>
+                    <input type="text" name="tasktitle" id="titleID" value="" readonly/><br><br>
                     <textarea name="taskbody" rows="10" cols="40" id="bodyID" wrap="hard" readonly>
                     </textarea><br>
                     <button type="submit" class="button button-delsub">
@@ -140,8 +140,8 @@
           <div class="modal-body">
               <div class="divform">
                   <form class = "centerform" method="post" action="/users/changecolor">
-                        Hey comrade, I work!
-                      <input type="text" name="tasktitle" id="titleID" value="" readonly>
+                      Change the notes color!<br>
+                      <input type="color" name="taskcolor" id="colorID" value="">
                       <input type="hidden" name="dbid" id="taskID" value="" readonly>
                 </form>
               </div>
@@ -168,7 +168,9 @@
     });
     $(document).on("click",".button-del",function(){
         var mytaskid = $(this).data('id');
+        var mytasktitle = $(this).data('title');
         var mytaskbody = $(this).data('body');
+        $(".modal-body #titleID").val( mytasktitle );
         $(".modal-body #taskID").val( mytaskid );
         $(".modal-body #bodyID").val( mytaskbody );
 

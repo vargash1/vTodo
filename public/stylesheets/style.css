@@ -80,7 +80,6 @@ body {
     font-size: 10px;
     box-shadow: 0 4px 8px 0 rgba(0,0,0,0.24),0 4px 8px 0 rgba(0,0,0,0.19);
 }
-
 /*modal buttons*/
 .button-delsub {
     background-color: black;
@@ -238,8 +237,8 @@ blockquote {
     transition: transform .8s ease-in-out;
 }
 .fa-plus-circle:hover{
-     -webkit-transform: rotate(360deg);
-     transform: rotate(360deg);
+     -webkit-transform: rotate(720deg);
+     transform: rotate(720deg);
 }
 .fa-cog{
     -webkit-transition: -webkit-transform .8s ease-in-out;
