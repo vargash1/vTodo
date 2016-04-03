@@ -3,7 +3,7 @@
 * @Date:   Wednesday, March 30th 2016, 5:34:31 pm
 * @Email:  vargash1@wit.edu
 * @Last modified by:   vargash1
-* @Last modified time: Sunday, April 3rd 2016, 1:39:12 pm
+* @Last modified time: Sunday, April 3rd 2016, 5:28:06 pm
 */
 
 var express = require('express');
@@ -112,25 +112,38 @@ router.get('/modifytask',
         });
     });
 
-// checking for valid tasks
-function validTaskTitle(ttitle){
-    var modtitle = ttitle.trim();
-    return  modtitle !== '' && modtitle.length >= 3;
-}
-
+// what is the point of having an empty task?
 function validTaskBody(tbody){
     var modbody = tbody.trim();
     return modbody !== '' && modbody.length >= 3;
 }
 
+// generate current time if time isnt passed
 function validTime(ttime){
     var modtime = ttime.trim();
-    return modtime !== '';
+    if (modtime === ''){
+        console.log("[INFO] Time Missing and will be set to Current Time");
+        modtime = moment().format('HH:mm:ss');
+        return modtime;
+    }else {
+        return ttime;
+    }
 }
 
+// generate tomorrow's date if date isnt passed
 function validDate(tdate){
     var moddate = tdate.trim();
-    return moddate !== '';
+    if (moddate === ''){
+        var tmmr = moment().add(1,'days');
+        moddate = tmmr.format('YYYY-MM-DD')
+        return moddate;
+    }else{
+        return tdate;
+    }
+}
+
+function typeOf (obj) {
+  return {}.toString.call(obj).split(' ')[1].slice(0, -1).toLowerCase();
 }
 
 // Fetches all tasks in database that belong to the user
@@ -141,7 +154,7 @@ function fetchTasks(req, res, next){
             console.error("[INFO] Unable to Connect to Database");
         }
         console.log("[INFO] Querying Database");
-        client.query('SELECT title,to_char(datedue, \'MM-DD-YYYY\'),timedue,taskbody,colors FROM notes WHERE username=$1 ORDER BY noteid DESC',[req.user.username],
+        client.query('SELECT noteid,title,to_char(datedue, \'MM-DD-YYYY\'),timedue,taskbody,colors FROM notes WHERE username=$1 ORDER BY noteid DESC',[req.user.username],
         function(err,result){
             if (err){
                 console.log(err);
@@ -163,33 +176,22 @@ function fetchTasks(req, res, next){
 router.post('/addtask',
     function(req, res, next){
 
-        console.log(req.body.timedue);
-        console.log(req.body.datedue);
-
         //Reject invalid task body
         if (!validTaskBody(req.body.taskbody)){
             console.log("[INFO] Invalid Task Body!");
             return res.render('addtask',{
                 user: req.user,
+                msg: "True",
                 message: "Invalid Task Body!",
                 rules: [
-                     {rule: "Task Body must compose of at least 3 characters!"},
+                     {rule: "Task Body must contain at least 3 characters!"},
                      {rule: "Task Body cannot be empty!"}
                 ]
             });
         }
 
-        //Reject invalid task date and time
-        if (!validDate(req.body.datedue) || !validTime(req.body.timedue)){
-            console.log("[INFO] Invalid Date/Time!");
-            return res.render('addtask',{
-                user: req.user,
-                message: "Invalid Task Time/Date!",
-                rules:[
-                    {rule: "Please Make Sure Task Time/Date is Valid!"}
-                ]
-            });
-        }
+        req.body.datedue = validDate(req.body.datedue);
+        req.body.timedue = validTime(req.body.timedue);
 
         var db = new Promise(function(resolve,reject){
         console.log("[INFO] Connecting to Database");
@@ -232,7 +234,6 @@ router.post('/addtask',
                     console.error(err);
                 }
                 data[0].next();
-                console.log("[INFO] Created Task");
                 console.log("[INFO] Released Client Back Into Pool");
                 fetchTasks(req,res,function(usertasks){
                     res.render('user',{user:req.user,tasks:usertasks});
@@ -614,8 +615,8 @@ router.post('/modifytask',
         });
         Promise.all([db]).then(function(data) {
             console.log("[INFO] Updating Task Info");
-            data[0].client.query('UPDATE notes SET title=$1, datedue=$2, timedue=$3, taskbody=$4 WHERE username=$5 AND title=$6 AND noteid=$7',
-            [req.body.newtasktitle, req.body.datedue, req.body.timedue, req.body.taskbody,req.user.username,req.body.oldtasktitle,req.body.dbid],
+            data[0].client.query('UPDATE notes SET title=$1, datedue=$2, timedue=$3, taskbody=$4 WHERE username=$5 AND noteid=$6',
+            [req.body.tasktitle, req.body.datedue, req.body.timedue, req.body.taskbody,req.user.username,req.body.dbid],
             function(err, result) {
                 if(err){
                     console.log("[INFO] Unable To Insert Note into Database");
