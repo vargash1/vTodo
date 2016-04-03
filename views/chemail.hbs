@@ -3,7 +3,7 @@
 @Date:   Tuesday, March 29th 2016, 6:30:27 pm
 @Email:  vargash1@wit.edu
 @Last modified by:   vargash1
-@Last modified time: Thursday, March 31st 2016, 6:32:32 pm
+@Last modified time: Saturday, April 2nd 2016, 6:04:15 pm
 -->
 
 <div class = "divform">
@@ -16,4 +16,15 @@
         <br>
     </form>
     <br>
+    {{#if message}}
+        <i class="fa fa-exclamation-triangle"></i> {{message}}
+    {{/if}}
+    <br>
+    {{#if rules}}
+        {{#each rules}}
+            {{rule}}<br>
+        {{/each}}
+    {{/if}}
+    <br>
+
 </div>

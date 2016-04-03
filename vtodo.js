@@ -3,7 +3,7 @@
 * @Date:   Monday, March 28th 2016, 3:29:51 pm
 * @Email:  vargash1@wit.edu
 * @Last modified by:   vargash1
-* @Last modified time: Thursday, March 31st 2016, 6:32:34 pm
+* @Last modified time: Sunday, April 3rd 2016, 1:39:21 pm
 */
 
 var express = require('express');
@@ -33,7 +33,7 @@ function(username,password,done){
             console.error("[INFO] Unable To Connect To Database");
         }
         console.log("[INFO] Connected to Database");
-        client.query('SELECT * FROM users WHERE username = $1', [username], function(err, result) {
+        client.query('SELECT * FROM users WHERE username=$1', [username], function(err, result) {
             next();
             if (result.rows.length > 0){
                 var matched = bcrypt.compareSync(password, result.rows[0].password);

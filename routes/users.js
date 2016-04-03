@@ -3,7 +3,7 @@
 * @Date:   Wednesday, March 30th 2016, 5:34:31 pm
 * @Email:  vargash1@wit.edu
 * @Last modified by:   vargash1
-* @Last modified time: Friday, April 1st 2016, 2:16:03 pm
+* @Last modified time: Sunday, April 3rd 2016, 1:39:12 pm
 */
 
 var express = require('express');
@@ -12,7 +12,9 @@ var passport = require('passport');
 var pg = require('pg')
 var bcrypt = require('bcryptjs');
 var Promise = require('promise');
+var moment = require('moment');
 require('dotenv').config();
+moment().format();
 
 /* GET users listing. */
 router.get('/',
@@ -81,7 +83,7 @@ function loggedIn(req, res, next) {
         next();
     }
     else{
-        res.render('login',{ user: req.user });
+        res.render('login');
     }
  }
 
@@ -139,9 +141,10 @@ function fetchTasks(req, res, next){
             console.error("[INFO] Unable to Connect to Database");
         }
         console.log("[INFO] Querying Database");
-        client.query('SELECT noteid,title,to_char(datedue, \'MM-DD-YYYY\'),timedue,taskbody FROM notes WHERE username=$1 ORDER BY noteid DESC',[req.user.username],
+        client.query('SELECT title,to_char(datedue, \'MM-DD-YYYY\'),timedue,taskbody,colors FROM notes WHERE username=$1 ORDER BY noteid DESC',[req.user.username],
         function(err,result){
             if (err){
+                console.log(err);
                 console.error("[INFO] Unable to Query DB");
             }
             else if (result.rows.length > 0){
@@ -160,31 +163,33 @@ function fetchTasks(req, res, next){
 router.post('/addtask',
     function(req, res, next){
 
-        // Reject invalid task title
-        if (!validTaskTitle(req.body.tasktitle)) {
-            console.log("[INFO] Invalid Task Title!");
-            return res.render('addtask',{
-                message: "Invalid Task Title!",
-                rules: "Task Title must be at least 3 characters long!"
-            });
-        }
+        console.log(req.body.timedue);
+        console.log(req.body.datedue);
+
         //Reject invalid task body
         if (!validTaskBody(req.body.taskbody)){
             console.log("[INFO] Invalid Task Body!");
             return res.render('addtask',{
+                user: req.user,
                 message: "Invalid Task Body!",
-                rules: "Task Body must compose of at least 3 characters!"
+                rules: [
+                     {rule: "Task Body must compose of at least 3 characters!"},
+                     {rule: "Task Body cannot be empty!"}
+                ]
             });
         }
+
         //Reject invalid task date and time
         if (!validDate(req.body.datedue) || !validTime(req.body.timedue)){
             console.log("[INFO] Invalid Date/Time!");
             return res.render('addtask',{
-                    message: "Invalid Task Time/Date!",
-                    rules: "Please Make Sure Task Time/Date is Valid!"
-                });
+                user: req.user,
+                message: "Invalid Task Time/Date!",
+                rules:[
+                    {rule: "Please Make Sure Task Time/Date is Valid!"}
+                ]
+            });
         }
-
 
         var db = new Promise(function(resolve,reject){
         console.log("[INFO] Connecting to Database");
@@ -199,22 +204,20 @@ router.post('/addtask',
         }).then(function(data) {
             return new Promise(function(resolve,reject){
                 console.log("[INFO] Querying Database");
-                data.client.query('SELECT * FROM notes WHERE title=$1 AND username=$2',[req.body.tasktitle,req.user.username],
+                data.client.query('SELECT * FROM users WHERE username=$1',[req.user.username],
                 function(err,result){
                     if (err){
                         console.log(err);
                         console.error("[INFO] Unable to Query DB");
                         reject(Error("Unable to Query DB"));
                     }
-                    else if (result.rows.length  > 0){
-                        data.next();
-                        console.log("[INFO] Task with Title already exists");
-                        console.log("[INFO] Released Client Back Into Pool");
-                        reject(Error("Task with Title already exists!"));
+                    else if (result.rows.length === 1){
+                        console.log("[INFO] Proceeding to add user task");
+                        resolve(data);
                     }
                     else{
-                        console.log("[INFO] Task Title available, adding Task");
-                        resolve(data);
+                        console.log("[WARN] User not Found!");
+                        reject(Error("User does not exist, Unexpected error!"))
                     }
                 });
             });
@@ -329,8 +332,7 @@ router.post('/signup',
       // Check if they're already a user
       return new Promise(function(resolve, reject) {
         console.log("[INFO] Querying DB for Username Availability");
-        data.client.query('SELECT * FROM users WHERE username=$1 or email=$2',
-            [req.body.username,req.body.email],
+        data.client.query('SELECT * FROM users WHERE username=$1 or email=$2',[req.body.username,req.body.email],
             function(err, result) {
                 if (err) {
                     console.log(err);
@@ -375,6 +377,7 @@ router.post('/chpasswd',
     if (!validPassword(req.body.password) || !validPassword(req.body.passwordc)) {
         console.log("[INFO] Invalid Password");
         return res.render('chpasswd',{
+            user:req.user,
             message: "Invalid Password!",
             rules: [
                 {rule: "Password must be at least 8 characters long"},
@@ -384,9 +387,11 @@ router.post('/chpasswd',
             ]
         });
     }
+
     if(req.body.password != req.body.passwordc){
         console.log("[INFO] Passwords don't Match!");
         return res.render('chpasswd',{
+            user:req.user,
             message: "Passwords Don't Match!",
             rules: [
                 {rule: "Passwords Must Match!"}
@@ -461,14 +466,18 @@ router.post('/chemail',
     if (!validEmail(req.body.email) || !validEmail(req.body.emailc)) {
         console.log("[INFO] Invalid Email");
         return res.render('chpasswd',{
+            user:req.user,
             message: "Invalid Email",
-            rules: "Please use an valid email!"
+            rules:[
+                {rule: "Please use an valid email!"}
+            ]
         });
     }
 
     if(req.body.email != req.body.emailc){
         console.log("[INFO] Passwords don't Match!");
         return res.render('chemail',{
+            user:req.user,
             message: "Emails Don't Match!",
             rules: [
                 {rule: "Emails Must Match!"}
@@ -558,12 +567,6 @@ function fetchInfo(req, res, next){
 router.post('/modifytask',
     function(req, res, next){
 
-        // Reject invalid task title
-        if (!validTaskTitle(req.body.newtasktitle)) {
-            console.log("[INFO] Invalid Task Title!");
-            return res.redirect('/users');
-
-        }
         //Reject invalid task body
         if (!validTaskBody(req.body.taskbody)){
             console.log("[INFO] Invalid Task Body!");
@@ -589,21 +592,21 @@ router.post('/modifytask',
         }).then(function(data) {
             return new Promise(function(resolve,reject){
                 console.log("[INFO] Querying Database");
-                data.client.query('SELECT * FROM notes WHERE title=$1 AND username=$2',[req.body.newtasktitle,req.user.username],
+                data.client.query('SELECT * FROM users WHERE username=$1',[req.user.username],
                 function(err,result){
                     if (err){
                         console.log(err);
                         console.error("[INFO] Unable to Query DB");
                         reject(Error("Unable to Query DB"));
                     }
-                    else if (result.rows.length === 0){
-                        console.log("[INFO] Task Found");
+                    else if (result.rows.length === 1){
+                        console.log("[INFO] User Found");
                         console.log("[INFO] Released Client Back Into Pool");
                         resolve(data);
                     }
                     else{
-                        console.log("[INFO] Task Title Already Taken!");
-                        reject(Error("Task with Title already exists!"));
+                        console.log("[WARN] User not Found!!");
+                        reject(Error("User does not exist, Unexpected error!"));
                         data.next();
                     }
                 });
@@ -611,8 +614,8 @@ router.post('/modifytask',
         });
         Promise.all([db]).then(function(data) {
             console.log("[INFO] Updating Task Info");
-            data[0].client.query('UPDATE notes SET title=$1, datedue=$2, timedue=$3, taskbody=$4 WHERE username=$5 AND title=$6',
-            [req.body.newtasktitle, req.body.datedue, req.body.timedue, req.body.taskbody,req.user.username,req.body.oldtasktitle],
+            data[0].client.query('UPDATE notes SET title=$1, datedue=$2, timedue=$3, taskbody=$4 WHERE username=$5 AND title=$6 AND noteid=$7',
+            [req.body.newtasktitle, req.body.datedue, req.body.timedue, req.body.taskbody,req.user.username,req.body.oldtasktitle,req.body.dbid],
             function(err, result) {
                 if(err){
                     console.log("[INFO] Unable To Insert Note into Database");
@@ -649,7 +652,7 @@ router.post('/deletetask',
         }).then(function(data) {
             return new Promise(function(resolve,reject){
                 console.log("[INFO] Querying Database");
-                data.client.query('SELECT * FROM notes WHERE title=$1 AND username=$2',[req.body.tasktitle,req.user.username],
+                data.client.query('SELECT * FROM notes WHERE noteid=$1 AND username=$2',[req.body.dbid,req.user.username],
                 function(err,result){
                     if (err){
                         console.log(err);
@@ -671,8 +674,8 @@ router.post('/deletetask',
         });
         Promise.all([db]).then(function(data) {
             console.log("[INFO] Updating Task Info");
-            data[0].client.query('DELETE FROM notes WHERE title=$1 AND username=$2',
-            [req.body.tasktitle,req.user.username],
+            data[0].client.query('DELETE FROM notes WHERE noteid=$1 AND username=$2',
+            [req.body.dbid,req.user.username],
             function(err, result) {
                 if(err){
                     console.log("[INFO] Unable To Delete Note from Database");
@@ -680,6 +683,67 @@ router.post('/deletetask',
                 }
                 data[0].next();
                 console.log("[INFO] Deleted Task!");
+                console.log("[INFO] Released Client Back Into Pool");
+                fetchTasks(req,res,function(usertasks){
+                        res.render('user',{ user:req.user, tasks:usertasks });
+                });
+            });
+        },function(reason){
+            console.log("[INFO] Unable to Delete Task!");
+            fetchTasks(req,res,function(usertasks){
+                res.render('user',{ user: req.user, tasks:usertasks });
+            });
+        });
+});
+
+// Deletes an existing task in the Database
+router.post('/changecolor',
+    function(req, res, next){
+
+        var db = new Promise(function(resolve,reject){
+        console.log("[INFO] Connecting to Database");
+        pg.connect(process.env.CONSTRING,function(err, client, next){
+            if(err){
+                reject(Error("Unable to Connect to DB"));
+            }
+            else{
+                resolve({'client':client,'next':next});
+            }
+        });
+        }).then(function(data) {
+            return new Promise(function(resolve,reject){
+                console.log("[INFO] Querying Database");
+                data.client.query('SELECT * FROM notes WHERE noteid=$1 AND username=$2',[req.body.dbid,req.user.username],
+                function(err,result){
+                    if (err){
+                        console.log(err);
+                        console.error("[INFO] Unable to Query DB");
+                        reject(Error("Unable to Query DB"));
+                    }
+                    else if (result.rows.length === 1){
+                        console.log("[INFO] Task Found");
+                        console.log("[INFO] Released Client Back Into Pool");
+                        resolve(data);
+                    }
+                    else{
+                        console.log("[INFO] Task Title Does Not Exist");
+                        reject(Error("Unexpected Error: Task Title Does Not Exist"));
+                        data.next();
+                    }
+                });
+            });
+        });
+        Promise.all([db]).then(function(data) {
+            console.log("[INFO] Updating Task Info");
+            data[0].client.query('UPDATE notes SET colors=$1 WHERE noteid=$2 AND username=$3',
+            [req.body.newcol,req.body.dbid,req.user.username],
+            function(err, result) {
+                if(err){
+                    console.log("[INFO] Unable To Delete Note from Database");
+                    console.error(err);
+                }
+                data[0].next();
+                console.log("[INFO] Changed Task Color");
                 console.log("[INFO] Released Client Back Into Pool");
                 fetchTasks(req,res,function(usertasks){
                         res.render('user',{ user:req.user, tasks:usertasks });

@@ -3,16 +3,16 @@
 @Date:   Thursday, March 31st 2016, 2:27:56 am
 @Email:  vargash1@wit.edu
 @Last modified by:   vargash1
-@Last modified time: Thursday, March 31st 2016, 6:32:34 pm
+@Last modified time: Sunday, April 3rd 2016, 1:44:04 am
 -->
 <div class = "divform">
     <form class = "centerform" method="post" action="addtask">
         Task Title<br>
         <input type="text" name="tasktitle" placeholder="Task Title"><br>
         Date Due<br>
-        <input type="date" name="datedue"><br>
+        <input type="date" name="datedue" id="myDate"><br>
         Time Due<br>
-        <input type="time" name="timedue"><br><br>
+        <input type="time" name="timedue" id="myTime"><br><br>
         <textarea name="taskbody" rows="10" cols="40" wrap="hard">
         </textarea><br>
         <input type="submit" class="button" value="Add Task">
@@ -24,7 +24,15 @@
     {{/if}}
     <br>
     {{#if rules}}
-        {{rules}}
+        {{#each rules}}
+            {{rule}}<br>
+        {{/each}}
     {{/if}}
     <br>
 </div>
+<script>
+    var x = document.getElementById("myDate").required;
+    var y = document.getElementById("myTime").required;
+    alert(x);
+    alert(y);
+</script

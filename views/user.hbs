@@ -3,7 +3,7 @@
 @Date:   Wednesday, March 30th 2016, 5:42:52 pm
 @Email:  vargash1@wit.edu
 @Last modified by:   vargash1
-@Last modified time: Saturday, April 2nd 2016, 12:29:38 pm
+@Last modified time: Sunday, April 3rd 2016, 1:40:18 pm
 -->
 {{#unless user.username}}
     <div class = "divform">
@@ -32,17 +32,25 @@
                     <div class="titletext">
                         {{title}}
                         <div class="noteoptions">
-                            <button class="button button-mod" data-toggle="modal" data-target="#myModalMod"  data-id="{{title}}" data-body="{{taskbody}}" data-date="{{to_char}}" data-time="{{timedue}}">
+                            <button class="button button-mod" data-toggle="modal" data-target="#myModalMod"  data-id="{{noteid}}" data-title="{{title}}" data-body="{{taskbody}}" data-date="{{to_char}}" data-time="{{timedue}}">
                                 <i class="fa fa-wrench fa-fw"></i>
                             </button>
-                            <button class="button button-del" data-toggle="modal" data-target="#myModalDel"  data-id="{{title}}">
+                            <button class="button button-del" data-toggle="modal" data-target="#myModalDel"  data-id="{{noteid}}" data-title="{{title}}" data-body="{{taskbody}}">
                                 <i class="fa fa-eraser fa-fw"></i>
+                            </button>
+                            <button class="button button-col" data-toggle="modal" data-target="#myModalCol"  data-id="{{noteid}}" data-title="{{title}}">
+                                <i class="zmdi zmdi-palette"></i>
                             </button>
                         </div>
                     </div>
                     <br>
                     {{taskbody}} <br>
-                    <i class="fa fa-calendar fa-fw"></i> {{to_char}} <i class="fa fa-clock-o fa-fw"></i> {{timedue}} <br>
+                    {{#if to_char}}
+                        <i class="fa fa-calendar fa-fw"></i> {{to_char}}
+                    {{/if}}
+                    {{#if timedue}}
+                        <i class="fa fa-clock-o fa-fw"></i> {{timedue}} <br>
+                    {{/if}}
             </blockquote>
         </div>
     {{/each}}
@@ -64,8 +72,8 @@
         <div class="modal-body">
             <div class="divform">
                 <form class = "centerform" method="post" action="/users/modifytask">
-                    <input type="hidden" name="oldtasktitle" id="taskID" value=""/>
-                    <input type="text" name="newtasktitle" id="newtaskID" value=""/> <br>
+                    <input type="hidden" name="dbid" id="taskID" value="" readonly/>
+                    <input type="text" name="tasktitle" id="titleID" value="" readonly/> <br>
                     Date Due<br>
                     <input type="date" name="datedue" id="dateID" value=""/><br>
                     Time Due<br>
@@ -98,9 +106,13 @@
       </div>
         <div class="modal-body">
             <div class="divform">
+                Are you sure you want to delete the following task?<br>
+                <i class="fa fa-exclamation-triangle fa-fw"></i> This cannot be undone!<br>
                 <form class = "centerform" method="post" action="/users/deletetask">
-                    <i class="fa fa-exclamation-triangle"></i> This cannot be undone.<br>
-                    <input type="hidden" name="tasktitle" id="taskID" value=""/>
+                    <input type="hidden" name="dbid" id="taskID" value="" readonly/>
+                    <input type="text" name="tasktitle" id="titleID" readonly/><br><br>
+                    <textarea name="taskbody" rows="10" cols="40" id="bodyID" wrap="hard" readonly>
+                    </textarea><br>
                     <button type="submit" class="button button-delsub">
                         <i class="fa fa-eraser fa-fw"></i>  Delete Task
                     </button>
@@ -113,21 +125,57 @@
     </div>
   </div>
   </div>
+  <!-- Color Modal -->
+  <div class="modal fade" id="myModalCol" tabindex="-1" role="dialog" aria-labelledby="myModalLabelCol" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">
+                  &times;
+              </span>
+          </button>
+          <h4 class="modal-title" id="myModalLabelCol"> Change Task Color </h4>
+        </div>
+          <div class="modal-body">
+              <div class="divform">
+                  <form class = "centerform" method="post" action="/users/changecolor">
+                        Hey comrade, I work!
+                      <input type="text" name="tasktitle" id="titleID" value="" readonly>
+                      <input type="hidden" name="dbid" id="taskID" value="" readonly>
+                </form>
+              </div>
+          </div>
+        <div class="modal-footer">
+          <button type="button" class="button" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+    </div>
 <!--  Easiest way to do this now unfortunately-->
 <script>
-    $(document).on("click", ".buttonoptMod", function () {
+    $(document).on("click", ".button-mod", function () {
         var mytaskid = $(this).data('id');
+        var mytasktitle = $(this).data('title');
         var mytaskbody = $(this).data('body');
         var mytaskdate = $(this).data('date');
         var mytasktime = $(this).data('time');
-        $(".modal-body #newtaskID").val( mytaskid );
         $(".modal-body #taskID").val( mytaskid );
+        $(".modal-body #titleID").val( mytasktitle );
         $(".modal-body #bodyID").val( mytaskbody );
         $(".modal-body #dateID").val( mytaskdate  );
         $(".modal-body #timeID").val( mytasktime );
     });
-    $(document).on("click",".buttonoptDel",function(){
+    $(document).on("click",".button-del",function(){
+        var mytaskid = $(this).data('id');
+        var mytaskbody = $(this).data('body');
+        $(".modal-body #taskID").val( mytaskid );
+        $(".modal-body #bodyID").val( mytaskbody );
+
+    });
+    $(document).on("click",".button-col",function(){
         var mytaskid = $(this).data('id');
         $(".modal-body #taskID").val( mytaskid );
     });
+
 </script>
