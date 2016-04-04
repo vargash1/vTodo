@@ -1,11 +1,11 @@
 body {
   padding: 50px;
   font-family: 'PT Sans', sans-serif;
-  background-color: white;
+  background-color: #19191F;
 }
 .titleheader {
     text-align: center;
-    color: black;
+    color: white;
     margin-left: auto;
     margin-right: auto;
 }
@@ -63,21 +63,18 @@ body {
     font-size: 9px;
 }
 .button-mod:hover{
-    background-color: black;
-    color: white;
+    background: rgba(0, 0, 0, 0.0);
     font-size: 10px;
     box-shadow: 0 4px 8px 0 rgba(0,0,0,0.24),0 4px 8px 0 rgba(0,0,0,0.19);
 }
 .button-del:hover{
-    background-color: black;
-    color: white;
+    background: rgba(0, 0, 0, 0.0);
     font-size: 10px;
     box-shadow: 0 4px 8px 0 rgba(0,0,0,0.24),0 4px 8px 0 rgba(0,0,0,0.19);
 }
 .button-col:hover{
-    background-color: black;
-    color: white;
     font-size: 10px;
+    background: rgba(0, 0, 0, 0.0);
     box-shadow: 0 4px 8px 0 rgba(0,0,0,0.24),0 4px 8px 0 rgba(0,0,0,0.19);
 }
 /*modal buttons*/
@@ -104,6 +101,18 @@ body {
     font-size: 12px;
     color:white;
     background-color: green;
+}
+.button-colsub {
+    background-color: black;
+    border: none;
+    color: white;
+    text-align: center;
+    text-decoration: none;
+}
+.button-colsub:hover {
+    font-size: 12px;
+    color: white;
+    background-color: #1793D1;
 }
 .wrapper{
     text-align: center;
@@ -179,7 +188,7 @@ blockquote {
   clear: both;
 }
 .grid-item--width2 {
-    width: 200px;
+    width: 200px; #1793D1;
 }
 .tooltip {
     position: relative;
@@ -206,6 +215,7 @@ blockquote {
 }
 /*font awesome stuff*/
 .fa-exclamation-triangle{
+    animation: blinker 0.5s linear infinite;
     color:red;
 }
 .modal-header{
@@ -229,8 +239,8 @@ blockquote {
     -webkit-box-shadow: none;
 	-moz-box-shadow: none;
 	box-shadow: none;
-    -webkit-transform: rotate(180deg);
-    transform: rotate(180deg);
+    -webkit-transform: rotate(720deg);
+    transform: rotate(720deg);
 }
 .fa-plus-circle{
     -webkit-transition: -webkit-transform .8s ease-in-out;
@@ -260,7 +270,62 @@ blockquote {
     -moz-animation:spin 2s linear infinite;
     animation:spin 2s linear infinite;
 }
+.zmdi-circle{
+    font-size: 12px;
+}
+.btn-primary{
+    background-color: black;
+    border-color: black
+}
+.btn-primary:active{
+    background-color: white;
+}
+.btn-primary:hover{
+    background-color: white;
+}
+.btn.active,.btn-primary:active,.btn-primary:active, .btn:active {
+    background-color: white;
+}
+.btn.hover, .btn:hover {
+    background-color: white;
+}
+.dropdown-toggle.btn-primary:focus,
+.dropdown-toggle.btn-primary:hover,
+.dropdown-toggle.btn-primary:active{
+    background-color: white;
 
+}
+.btn-primary.active, .btn-primary:active, .open>.dropdown-toggle.btn-primary{
+    background-color: white;
+
+}
+.btn-primary.active.focus, .btn-primary.active:focus, .btn-primary.active:hover, .btn-primary:active.focus, .btn-primary:active:focus, .btn-primary:active:hover, .open>.dropdown-toggle.btn-primary.focus, .open>.dropdown-toggle.btn-primary:focus, .open>.dropdown-toggle.btn-primary:hover{
+    background-color: white;
+}
+textarea:focus,
+input[type="text"]:focus,
+input[type="password"]:focus,
+input[type="datetime"]:focus,
+input[type="datetime-local"]:focus,
+input[type="date"]:focus,
+input[type="month"]:focus,
+input[type="time"]:focus,
+input[type="week"]:focus,
+input[type="number"]:focus,
+input[type="email"]:focus,
+input[type="url"]:focus,
+input[type="search"]:focus,
+input[type="tel"]:focus,
+input[type="color"]:focus,
+.uneditable-input:focus {
+  border-color:  black;
+  box-shadow:  0 12px 16px 0 rgba(0,0,0,0.24),0 17px 50px 0 rgba(0,0,0,0.19);
+  outline: 0 none;
+}
+
+@keyframes blinker {
+  50% { opacity: 0.0; }
+}
 @-moz-keyframes spin { 100% { -moz-transform: rotate(360deg); } }
 @-webkit-keyframes spin { 100% { -webkit-transform: rotate(360deg); } }
 @keyframes spin { 100% { -webkit-transform: rotate(360deg); transform:rotate(360deg); } }

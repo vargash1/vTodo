@@ -3,8 +3,37 @@
 @Date:   Thursday, March 31st 2016, 2:27:56 am
 @Email:  vargash1@wit.edu
 @Last modified by:   vargash1
-@Last modified time: Sunday, April 3rd 2016, 5:58:25 pm
+@Last modified time: Sunday, April 3rd 2016, 11:06:44 pm
 -->
+<form method="post" action="addtask">
+    <div class="form-group row">
+        <label for="taskT" class="col-sm-2 form-control-label">Task Title</label>
+        <div class="col-sm-10">
+            <input type="text" name="tasktitle" class="form-control" id="taskT" placeholder="Task Title">
+        </div>
+    </div>
+    <div class="form-group row">
+        <label for="taskDD" class="col-sm-2 form-control-label">Date Due</label>
+        <div class="col-sm-10">
+            <input type="date" name="datedue" class="form-control" id="taskDD">
+        </div>
+    </div>
+    <div class="form-group row">
+        <label for="taskTD" class="col-sm-2 form-control-label">Time Due</label>
+        <div class="col-sm-10">
+            <input type="time" name="timedue" class="form-control" id="taskTD" >
+        </div>
+    </div>
+    <div class = "divform">
+        <label for="taskBD">Task Body</label>
+        <br>
+        <textarea  name="taskbody" cols="30"  wrap="hard" id="taskBD"></textarea>
+        <br>
+        <button type="submit" class="button">
+            <i class="zmdi zmdi-assignment"></i>  Add  Task
+        </button>
+    </div>
+</form>
 <div class = "divform">
     {{#if message}}
         <i class="fa fa-exclamation-triangle"></i> {{message}} <br>
@@ -14,14 +43,4 @@
             {{rule}}<br>
         {{/each}}
     {{/if}}
-    <form class = "centerform" method="post" action="addtask">
-        Task Title<br> <input type="text" name="tasktitle" placeholder="Task Title"><br>
-        Date Due<br> <input type="date" name="datedue" id="myDate" ><br>
-        Time Due<br> <input type="time" name="timedue" id="myTime" ><br><br>
-        <textarea name="taskbody" rows="10" cols="40" wrap="hard">
-        </textarea><br>
-        <input type="submit" class="button" value="Add Task">
-    </form>
-    <br>
-    <br>
 </div>

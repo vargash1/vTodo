@@ -1,12 +1,38 @@
+<!--
+@Author: Vargas Hector <vargash1>
+@Date:   Monday, March 28th 2016, 3:02:42 pm
+@Email:  vargash1@wit.edu
+@Last modified by:   vargash1
+@Last modified time: Sunday, April 3rd 2016, 11:07:36 pm
+-->
+<form method="post" action="signup">
+    <div class="form-group row">
+        <label for="usern" class="col-sm-2 form-control-label">Username</label>
+        <div class="col-sm-10">
+            <input type="text" name="username" class="form-control" id="usern" placeholder="Username">
+        </div>
+    </div>
+    <div class="form-group row">
+        <label for="usere" class="col-sm-2 form-control-label">Email</label>
+        <div class="col-sm-10">
+            <input type="email" name="email" class="form-control" id="usere" placeholder="Email">
+            <small class="text-muted">We'll never share your email with anyone else.</small>
+        </div>
+    </div>
+    <div class="form-group row">
+        <label for="userp" class="col-sm-2 form-control-label">Password</label>
+        <div class="col-sm-10">
+            <input type="password" name="password" class="form -control" id="userp" placeholder="Password">
+        </div>
+    </div>
+
+    <div class = "divform">
+        <button type="submit" class="button">
+            <i class="zmdi zmdi-accounts-add"></i> Sign Up
+        </button>
+    </div>
+</form>
 <div class = "divform">
-    <form class = "centerform" method="post" action="signup">
-        <input type="text" name="username" placeholder="Username"><br>
-        <input type="text" name="email" placeholder="Email"><br>
-        <input type="password" name="password" placeholder="Password"><br><br>
-        <input type="submit" class = "button" value="Sign Up">
-    </form>
-    <br>
-    <br>
     {{#if message}}
         <i class="fa fa-exclamation-triangle"></i> {{message}}
     {{/if}}

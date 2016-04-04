@@ -3,7 +3,7 @@
 * @Date:   Wednesday, March 30th 2016, 5:34:31 pm
 * @Email:  vargash1@wit.edu
 * @Last modified by:   vargash1
-* @Last modified time: Sunday, April 3rd 2016, 5:28:06 pm
+* @Last modified time: Sunday, April 3rd 2016, 11:21:03 pm
 */
 
 var express = require('express');
@@ -574,11 +574,8 @@ router.post('/modifytask',
             return res.redirect('/users');
         }
 
-        //Reject invalid task date and time
-        if (!validDate(req.body.datedue) || !validTime(req.body.timedue)){
-            console.log("[INFO] Invalid Date/Time!");
-            return res.redirect('/users');
-        }
+        req.body.datedue = validDate(req.body.datedue);
+        req.body.timedue = validTime(req.body.timedue);
 
         var db = new Promise(function(resolve,reject){
         console.log("[INFO] Connecting to Database");

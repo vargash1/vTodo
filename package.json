@@ -19,6 +19,7 @@
     "express-handlebars": "^3.0.0",
     "express-hbs": "^0.8.4",
     "express-session": "^1.13.0",
+    "font-awesome-animation": "0.0.8",
     "handlebars": "^4.0.5",
     "hbs": "^4.0.0",
     "jQuery": "^1.7.4",
