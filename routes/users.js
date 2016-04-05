@@ -3,7 +3,7 @@
 * @Date:   Wednesday, March 30th 2016, 5:34:31 pm
 * @Email:  vargash1@wit.edu
 * @Last modified by:   vargash1
-* @Last modified time: Sunday, April 3rd 2016, 11:21:03 pm
+* @Last modified time: Tuesday, April 5th 2016, 5:43:25 am
 */
 
 var express = require('express');
@@ -154,7 +154,7 @@ function fetchTasks(req, res, next){
             console.error("[INFO] Unable to Connect to Database");
         }
         console.log("[INFO] Querying Database");
-        client.query('SELECT noteid,title,to_char(datedue, \'MM-DD-YYYY\'),timedue,taskbody,colors FROM notes WHERE username=$1 ORDER BY noteid DESC',[req.user.username],
+        client.query('SELECT noteid,title,to_char(datedue, \'MM-DD-YYYY\'),timedue,taskbody,colors,txtcolor,bxshadow FROM notes WHERE username=$1 ORDER BY noteid DESC',[req.user.username],
         function(err,result){
             if (err){
                 console.log(err);
@@ -694,9 +694,27 @@ router.post('/deletetask',
         });
 });
 
+// Poor mans text color setting when text is too dark
+function setTextColor(ncolor){
+    if (ncolor == "#000080" || ncolor == "black"){
+        return "white";
+    }
+    return "black"
+}
+
+// Poor mans box shadow when text is too dark
+function setBoxShadow(ncolor){
+    if (ncolor == "#000080" || ncolor == "black"){
+        return "box-shadow: 0 4px 8px 0 rgba(255,255,255,0.24), 0 4px 8px 0  rgba(255,255,255,0.19)";
+    }
+    return "box-shadow: 0 4px 8px 0 rgba(0,0,0,0.24),0 4px 8px 0 rgba(0,0,0,0.19)";
+}
+
 // Deletes an existing task in the Database
 router.post('/changecolor',
     function(req, res, next){
+        req.body.txtclid = setTextColor(req.body.color);
+        req.body.bxid = setBoxShadow(req.body.color);
 
         var db = new Promise(function(resolve,reject){
         console.log("[INFO] Connecting to Database");
@@ -733,8 +751,8 @@ router.post('/changecolor',
         });
         Promise.all([db]).then(function(data) {
             console.log("[INFO] Updating Task Info");
-            data[0].client.query('UPDATE notes SET colors=$1 WHERE noteid=$2 AND username=$3',
-            [req.body.newcol,req.body.dbid,req.user.username],
+            data[0].client.query('UPDATE notes SET colors=$1,txtcolor=$2,bxshadow=$3 WHERE noteid=$4 AND username=$5',
+            [req.body.color,req.body.txtclid,req.body.bxid,req.body.dbid,req.user.username],
             function(err, result) {
                 if(err){
                     console.log("[INFO] Unable To Delete Note from Database");

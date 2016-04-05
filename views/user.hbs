@@ -3,7 +3,7 @@
 @Date:   Wednesday, March 30th 2016, 5:42:52 pm
 @Email:  vargash1@wit.edu
 @Last modified by:   vargash1
-@Last modified time: Monday, April 4th 2016, 11:43:40 am
+@Last modified time: Tuesday, April 5th 2016, 5:38:20 am
 -->
 {{#unless user.username}}
     <div class = "divform">
@@ -28,17 +28,18 @@
     <div class="grid" data-masonry='{ "columnWidth": 200, "gutter":10,"isFitWidth": true,"itemSelector": ".grid-item"}'>
     {{#each tasks}}
         <div class="grid-item">
-            <blockquote class="note notecolor" style="background-color:{{colors}};">
+            <blockquote class="note notecolor" style="background-color:{{colors}};color:{{txtcolor}}">
                     <div class="titletext">
                         {{title}}
+
                         <div class="noteoptions">
-                            <button class="button button-mod" data-toggle="modal" data-target="#myModalMod"  data-id="{{noteid}}" data-title="{{title}}" data-body="{{taskbody}}" data-date="{{to_char}}" data-time="{{timedue}}">
+                            <button class="button button-mod" style="color:{{txtcolor}};" data-toggle="modal" data-target="#myModalMod"  data-id="{{noteid}}" data-title="{{title}}" data-body="{{taskbody}}" data-date="{{to_char}}" data-time="{{timedue}}">
                                 <i class="fa fa-wrench fa-fw"></i>
                             </button>
-                            <button class="button button-del" data-toggle="modal" data-target="#myModalDel"  data-id="{{noteid}}" data-title="{{title}}" data-body="{{taskbody}}">
+                            <button class="button button-del" style="color:{{txtcolor}};" data-toggle="modal" data-target="#myModalDel"  data-id="{{noteid}}" data-title="{{title}}" data-body="{{taskbody}}">
                                 <i class="fa fa-eraser fa-fw"></i>
                             </button>
-                            <button class="button button-col" data-toggle="modal" data-target="#myModalCol"  data-id="{{noteid}}" data-title="{{title}}">
+                            <button class="button button-col" style="color:{{txtcolor}};" data-toggle="modal" data-target="#myModalCol"  data-id="{{noteid}}" data-title="{{title}}">
                                 <i class="zmdi zmdi-palette"></i>
                             </button>
                         </div>
@@ -168,68 +169,137 @@
                   <div class="divform">
                       Change the task's color!<br>
                   </div>
+                  <br>
                   <input type="hidden" name="dbid" id="taskID" value="" readonly/>
+                  <input type="hidden" name="txtclid" id="txtcolID" value="">
+                  <input type="hidden" name="bxid" id="bxID" value="">
+                  <div class="text-center">
                   <div class="btn-group" data-toggle="buttons">
+                            <label class="btn btn-primary active" style="background-color:#1793D1;">
+                                <input type="radio" name="color" autocomplete="off" value="#1793D1" checked>
+                                <i class="zmdi zmdi-circle  zmdi-hc-fw" style="color:#1793D1;"></i>
+                            </label>
+                            <label class="btn btn-primary" style="background-color: #00FFFF;">
+                                <input type="radio" name="color"  autocomplete="off" value="#00FFFF">
+                                <i class="zmdi zmdi-circle  zmdi-hc-fw" style="color:#00FFFF;"></i>
+                            </label>
+                            <label class="btn btn-primary" style="background-color: #7FFFD4;">
+                                <input type="radio" name="color"  autocomplete="off" value="#7FFFD4">
+                                <i class="zmdi zmdi-circle  zmdi-hc-fw" style="color:#7FFFD4;"></i>
+                            </label>
+                            <label class="btn btn-primary" style="background-color:#FFB6C1;">
+                                <input type="radio" name="color"  autocomplete="off" value="#FFB6C1">
+                                <i class="zmdi zmdi-circle  zmdi-hc-fw" style="color:#FFB6C1;"></i>
+                            </label>
+                            <label class="btn btn-primary" style="background-color:#FFA07A;">
+                                <input type="radio"  name="color" autocomplete="off" value="#FFA07A">
+                                <i class="zmdi zmdi-circle  zmdi-hc-fw" style="color: #FFA07A;"></i>
+                            </label>
+                            <label class="btn btn-primary" style="background-color:#20B2AA;">
+                                <input type="radio"  name="color" autocomplete="off" value="#20B2AA">
+                                <i class="zmdi zmdi-circle  zmdi-hc-fw" style="color:#20B2AA;"></i>
+                            </label>
+                            <label class="btn btn-primary" style="background-color:#90EE90;">
+                                <input type="radio"  name="color"  autocomplete="off" value="#90EE90">
+                                <i class="zmdi zmdi-circle  zmdi-hc-fw" style="color: #90EE90;"></i>
+                            </label>
+                            <label class="btn btn-primary" style="background-color:#FF69B4;">
+                                <input type="radio"  name="color" autocomplete="off" value="#FF69B4">
+                                <i class="zmdi zmdi-circle  zmdi-hc-fw" style="color: #FF69B4;"></i>
+                            </label>
+                            <label class="btn btn-primary" style="background-color:#FFD700;">
+                                <input type="radio"  name="color" autocomplete="off" value="#FFD700">
+                                <i class="zmdi zmdi-circle  zmdi-hc-fw" style="color: #FFD700;"></i>
+                            </label>
+                            <label class="btn btn-primary" style="background-color:#2F4F4F;">
+                                <input type="radio"  name="color" autocomplete="off" value="#2F4F4F">
+                                <i class="zmdi zmdi-circle  zmdi-hc-fw" style="color: #2F4F4F;"></i>
+                            </label>
+                            <label class="btn btn-primary" style="background-color:#DC143C;">
+                                <input type="radio"  name="color" autocomplete="off" value="#DC143C">
+                                <i class="zmdi zmdi-circle  zmdi-hc-fw" style="color: #DC143C;"></i>
+                            </label>
+                            <label class="btn btn-primary" style="background-color:#FAEBD7;">
+                                <input type="radio"  name="color" autocomplete="off" value="#FAEBD7">
+                                <i class="zmdi zmdi-circle  zmdi-hc-fw" style="color: #FAEBD7;"></i>
+                            </label>
+                            <label class="btn btn-primary" style="background-color:#ADD8E6;">
+                                <input type="radio"  name="color" autocomplete="off" value="option7">
+                                <i class="zmdi zmdi-circle  zmdi-hc-fw" style="color: #ADD8E6;"></i>
+                            </label>
+                            <label class="btn btn-primary" style="background-color:#66CDAA;">
+                                <input type="radio"  name="color" autocomplete="off" value="#66CDAA">
+                                <i class="zmdi zmdi-circle  zmdi-hc-fw" style="color: #66CDAA;"></i>
+                            </label>
+                            <label class="btn btn-primary" style="background-color:#3CB371;">
+                                <input type="radio"  name="color" autocomplete="off" value="#3CB371">
+                                <i class="zmdi zmdi-circle  zmdi-hc-fw" style="color: #3CB371;"></i>
+                            </label>
+                            <label class="btn btn-primary" style="background-color:#7B68EE;">
+                                <input type="radio"  name="color" autocomplete="off" value="#7B68EE">
+                                <i class="zmdi zmdi-circle  zmdi-hc-fw" style="color: #7B68EE;"></i>
+                            </label>
+                            <!--  Dark -->
+                            <label class="btn btn-primary" style="background-color:#000080;">
+                                <input type="radio"  name="color" autocomplete="off" value="#000080">
+                                <i class="zmdi zmdi-circle  zmdi-hc-fw" style="color: #000080;"></i>
+                            </label>
+                            <label class="btn btn-primary" style="background-color:#FF4500;">
+                                <input type="radio"  name="color" autocomplete="off" value="#FF4500">
+                                <i class="zmdi zmdi-circle  zmdi-hc-fw" style="color: #FF4500;"></i>
+                            </label>
+                            <label class="btn btn-primary" style="background-color:#DA70D6;">
+                                <input type="radio"  name="color" autocomplete="off" value="#DA70D6">
+                                <i class="zmdi zmdi-circle  zmdi-hc-fw" style="color: #DA70D6;"></i>
+                            </label>
+                            <label class="btn btn-primary" style="background-color:#98FB98;">
+                                <input type="radio"  name="color" autocomplete="off" value="#98FB98">
+                                <i class="zmdi zmdi-circle  zmdi-hc-fw" style="color: #98FB98;"></i>
+                            </label>
+                            <label class="btn btn-primary" style="background-color:#2E8B57;">
+                                <input type="radio"  name="color" autocomplete="off" value="#2E8B57">
+                                <i class="zmdi zmdi-circle  zmdi-hc-fw" style="color: #2E8B57;"></i>
+                            </label>
+                            <label class="btn btn-primary" style="background-color:#00FF7F;">
+                                <input type="radio"  name="color" autocomplete="off" value="#00FF7F">
+                                <i class="zmdi zmdi-circle  zmdi-hc-fw" style="color: #00FF7F;"></i>
+                            </label>
+                            <label class="btn btn-primary" style="background-color:#008080;">
+                                <input type="radio"  name="color" autocomplete="off" value="#008080">
+                                <i class="zmdi zmdi-circle  zmdi-hc-fw" style="color: #008080;"></i>
+                            </label>
+                            <label class="btn btn-primary" style="background-color:#708090;">
+                                <input type="radio"  name="color" autocomplete="off" value="#708090">
+                                <i class="zmdi zmdi-circle  zmdi-hc-fw" style="color: #708090;"></i>
+                            </label>
+                            <label class="btn btn-primary" style="background-color:white;">
+                                <input type="radio"  name="color" autocomplete="off" value="white">
+                                <i class="zmdi zmdi-circle  zmdi-hc-fw" style="color:white;"></i>
+                            </label>
+                            <label class="btn btn-primary" style="background-color:#FF0000;">
+                                <input type="radio"  name="color" autocomplete="off" value="#FF0000">
+                                <i class="zmdi zmdi-circle  zmdi-hc-fw" style="color: #FF0000;"></i>
+                            </label>
+                            <label class="btn btn-primary" style="background-color:#AFEEEE;">
+                                <input type="radio"  name="color" autocomplete="off" value="#AFEEEE">
+                                <i class="zmdi zmdi-circle  zmdi-hc-fw" style="color: #AFEEEE;"></i>
+                            </label>
+                            <label class="btn btn-primary" style="background-color:yellow;">
+                                <input type="radio"  name="color" autocomplete="off" value="yellow">
+                                <i class="zmdi zmdi-circle  zmdi-hc-fw" style="color:yellow;"></i>
+                            </label>
+                            <label class="btn btn-primary" style="background-color:#FF4500;">
+                                <input type="radio"  name="color" autocomplete="off" value="#FF4500">
+                                <i class="zmdi zmdi-circle  zmdi-hc-fw" style="color:#FF4500;"></i>
+                            </label>
+                            <label class="btn btn-primary" style="background-color:black;">
+                                <input type="radio"  name="color" autocomplete="off" value="black">
+                                <i class="zmdi zmdi-circle  zmdi-hc-fw" style="color:black;"></i>
+                            </label>
 
-                          <label class="btn btn-primary active">
-                              <input type="radio" name="color" id="option1" autocomplete="off" checked>
-                              <i class="zmdi zmdi-circle  zmdi-hc-fw" style="color: #1793D1;"></i>
-                          </label>
-                          <label class="btn btn-primary">
-                              <input type="radio" name="color" id="option2"  autocomplete="off">
-                              <i class="zmdi zmdi-circle  zmdi-hc-fw" style="color: #00FFFF;"></i>
-                          </label>
-                          <label class="btn btn-primary">
-                              <input type="radio" name="color" id="option3" autocomplete="off">
-                              <i class="zmdi zmdi-circle  zmdi-hc-fw" style="color: #7FFFD4;"></i>
-                          </label>
-
+                        </div>
                     </div>
                     <br>
-                        <!-- <label class="radio-inline">
-                              <input type="radio" class="with-font" name="inlineRadioOptions" id="inlineRadio1" value="option1">
-                              <i class="zmdi zmdi-circle  zmdi-hc-fw" style="color: #1793D1;"></i>
-                          </label>
-                          <label class="radio-inline">
-                              <input type="radio" class="with-font"  name="inlineRadioOptions" id="inlineRadio1" value="option1">
-                              <i class="zmdi zmdi-circle  zmdi-hc-fw" style="color: #00FFFF;"></i>
-                          </label>
-                          <label class="radio-inline">
-                              <input type="radio" class="with-font"  name="inlineRadioOptions" id="inlineRadio2" value="option2">
-                              <i class="zmdi zmdi-circle  zmdi-hc-fw" style="color: #7FFFD4;"></i>
-                          </label>
-                          <label class="radio-inline">
-                              <input type="radio" class="with-font"  name="inlineRadioOptions" id="inlineRadio3" value="option4">
-                              <i class="zmdi zmdi-circle  zmdi-hc-fw" style="color: #008B8B;"></i>
-                          </label>
-                          <label class="radio-inline">
-                              <input type="radio" class="with-font"  name="inlineRadioOptions" id="inlineRadio3" value="option5">
-                              <i class="zmdi zmdi-circle  zmdi-hc-fw" style="color: #DC143C;"></i>
-                          </label>
-                          <br>
-                          <label class="radio-inline">
-                              <input type="radio" class="with-font"  name="inlineRadioOptions" id="inlineRadio3" value="option6">
-                              <i class="zmdi zmdi-circle  zmdi-hc-fw" style="color: #FF1493;"></i>
-                          </label>
-
-                          <label class="radio-inline">
-                              <input type="radio" class="with-font"  name="inlineRadioOptions" id="inlineRadio3" value="option7">
-                              <i class="zmdi zmdi-circle  zmdi-hc-fw" style="color: #00BFFF;"></i>
-                          </label>
-                          <label class="radio-inline">
-                              <input type="radio" class="with-font"  name="inlineRadioOptions" id="inlineRadio3" value="option6">
-                              <i class="zmdi zmdi-circle  zmdi-hc-fw" style="color: #FFD700;"></i>
-                          </label>
-                          <label class="radio-inline">
-                              <input type="radio" class="with-font"  name="inlineRadioOptions" id="inlineRadio3" value="option7">
-                              <i class="zmdi zmdi-circle  zmdi-hc-fw" style="color: #ADFF2F;"></i>
-                          </label>
-                          <label class="radio-inline">
-                              <input type="radio" class="with-font"  name="inlineRadioOptions" id="inlineRadio3" value="option7">
-                              <i class="zmdi zmdi-circle  zmdi-hc-fw" style="color: #ADD8E6;"></i>
-                          </label>
-                          <br> -->
-
             </div>
                   <div class = "divform">
                       <button type="submit" class="button button-colsub">
