@@ -1,3 +1,11 @@
+/**
+* @Author: Vargas Hector <vargash1>
+* @Date:   Wednesday, April 13th 2016, 6:46:33 pm
+* @Email:  vargash1@wit.edu
+* @Last modified by:   vargash1
+* @Last modified time: Wednesday, April 13th 2016, 10:21:20 pm
+*/
+
 body {
   padding: 50px;
   font-family: 'PT Sans', sans-serif;
@@ -21,6 +29,7 @@ body {
     font-size: 10px;
     margin: 0px auto;
     cursor: pointer;
+    border-radius:2em;
     -webkit-transition-duration: 0.4s; /* Safari */
     transition-duration: 0.4s;
 }
@@ -77,6 +86,7 @@ body {
     background: rgba(0, 0, 0, 0.0);
     box-shadow: 0 4px 8px 0 rgba(0,0,0,0.24),0 4px 8px 0 rgba(0,0,0,0.19);
 }
+
 /*modal buttons*/
 .button-delsub {
     background-color: black;

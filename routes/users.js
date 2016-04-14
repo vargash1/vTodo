@@ -3,7 +3,7 @@
 * @Date:   Wednesday, March 30th 2016, 5:34:31 pm
 * @Email:  vargash1@wit.edu
 * @Last modified by:   vargash1
-* @Last modified time: Tuesday, April 5th 2016, 5:43:25 am
+* @Last modified time: Wednesday, April 13th 2016, 10:50:59 pm
 */
 
 var express = require('express');
@@ -696,7 +696,7 @@ router.post('/deletetask',
 
 // Poor mans text color setting when text is too dark
 function setTextColor(ncolor){
-    if (ncolor == "#000080" || ncolor == "black"){
+    if (ncolor == "#000080" || ncolor == "black" || ncolor == "#2F4F4F"){
         return "white";
     }
     return "black"
@@ -704,10 +704,10 @@ function setTextColor(ncolor){
 
 // Poor mans box shadow when text is too dark
 function setBoxShadow(ncolor){
-    if (ncolor == "#000080" || ncolor == "black"){
-        return "box-shadow: 0 4px 8px 0 rgba(255,255,255,0.24), 0 4px 8px 0  rgba(255,255,255,0.19)";
+    if (ncolor == "#000080" || ncolor == "black" || ncolor == "#2F4F4F"){
+        return "0 4px 8px 0 rgba(255,255,255,0.24), 0 4px 8px 0  rgba(255,255,255,0.19)";
     }
-    return "box-shadow: 0 4px 8px 0 rgba(0,0,0,0.24),0 4px 8px 0 rgba(0,0,0,0.19)";
+    return "0 4px 8px 0 rgba(0,0,0,0.24),0 4px 8px 0 rgba(0,0,0,0.19)";
 }
 
 // Deletes an existing task in the Database

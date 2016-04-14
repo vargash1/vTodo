@@ -3,7 +3,7 @@
 @Date:   Wednesday, March 30th 2016, 5:42:52 pm
 @Email:  vargash1@wit.edu
 @Last modified by:   vargash1
-@Last modified time: Tuesday, April 5th 2016, 6:09:00 am
+@Last modified time: Wednesday, April 13th 2016, 10:38:15 pm
 -->
 {{#unless user.username}}
     <div class = "divform">
@@ -33,13 +33,13 @@
                         {{title}}
 
                         <div class="noteoptions">
-                            <button class="button button-mod" style="color:{{txtcolor}};" data-toggle="modal" data-target="#myModalMod"  data-id="{{noteid}}" data-title="{{title}}" data-body="{{taskbody}}" data-date="{{to_char}}" data-time="{{timedue}}">
+                            <button class="button button-mod" id="modifyButton" style="color:{{txtcolor}};" data-toggle="modal" data-target="#myModalMod"  data-id="{{noteid}}" data-title="{{title}}" data-body="{{taskbody}}" data-date="{{to_char}}" data-time="{{timedue}}" data-shadow="{{bxshadow}}">
                                 <i class="fa fa-wrench fa-fw"></i>
                             </button>
-                            <button class="button button-del" style="color:{{txtcolor}};" data-toggle="modal" data-target="#myModalDel"  data-id="{{noteid}}" data-title="{{title}}" data-body="{{taskbody}}">
+                            <button class="button button-del" id="deleteButton" style="color:{{txtcolor}};" data-toggle="modal" data-target="#myModalDel"  data-id="{{noteid}}" data-title="{{title}}" data-body="{{taskbody}}" data-shadow="{{bxshadow}}">
                                 <i class="fa fa-eraser fa-fw"></i>
                             </button>
-                            <button class="button button-col" style="color:{{txtcolor}};" data-toggle="modal" data-target="#myModalCol"  data-id="{{noteid}}" data-title="{{title}}">
+                            <button class="button button-col" id="colorButton" style="color:{{txtcolor}};" data-toggle="modal" data-target="#myModalCol"  data-id="{{noteid}}" data-title="{{title}}" data-shadow="{{bxshadow}}">
                                 <i class="zmdi zmdi-palette"></i>
                             </button>
                         </div>
@@ -342,6 +342,23 @@
         var mytasktitle = $(this).data('title');
         $(".modal-body #titleID").val( mytasktitle );
         $(".modal-body #taskID").val( mytaskid );
+    })
+    $(".button-col").hover(function(){
+        var newbxshadow  = $(this).data("shadow");
+        $(this).css('box-shadow',newbxshadow);
+    }, function(){
+        $(this).css('box-shadow','');
     });
-
+    $(".button-del").hover(function(){
+        var newbxshadow  = $(this).data("shadow");
+        $(this).css('box-shadow',newbxshadow);
+    }, function(){
+        $(this).css('box-shadow','');
+    });
+    $(".button-mod").hover(function(){
+        var newbxshadow  = $(this).data("shadow");
+        $(this).css('box-shadow',newbxshadow);
+    }, function(){
+        $(this).css('box-shadow','');
+    });
 </script>
