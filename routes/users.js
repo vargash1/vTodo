@@ -3,7 +3,7 @@
 * @Date:   Wednesday, March 30th 2016, 5:34:31 pm
 * @Email:  vargash1@wit.edu
 * @Last modified by:   vargash1
-* @Last modified time: Thursday, April 14th 2016, 6:10:08 pm
+* @Last modified time: Thursday, April 14th 2016, 6:51:21 pm
 */
 
 var express = require('express');
@@ -223,6 +223,8 @@ router.post('/addtask',
 
         req.body.datedue = validDate(req.body.datedue);
         req.body.timedue = validTime(req.body.timedue);
+        req.body.txtclid = setTextColor(req.body.color);
+        req.body.bxid = setBoxShadow(req.body.color);
 
         var db = new Promise(function(resolve,reject){
         console.log(" Connecting to Database");
@@ -257,8 +259,8 @@ router.post('/addtask',
         });
         Promise.all([db]).then(function(data) {
             console.log(" Querying Database");
-            data[0].client.query('INSERT INTO notes (username,title,datedue,timedue,taskbody) VALUES($1,$2,$3,$4,$5)',
-            [req.user.username, req.body.tasktitle, req.body.datedue, req.body.timedue, req.body.taskbody],
+            data[0].client.query('INSERT INTO notes (username,title,datedue,timedue,taskbody,colors,txtcolor,bxshadow) VALUES($1,$2,$3,$4,$5,$6,$7,$8)',
+            [req.user.username, req.body.tasktitle, req.body.datedue, req.body.timedue, req.body.taskbody, req.body.color, req.body.txtclid ,req.body.bxid],
             function(err, result) {
                 if(err){
                     console.log(" Unable To Insert Note into Database");

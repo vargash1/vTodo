@@ -3,7 +3,7 @@
 @Date:   Thursday, March 31st 2016, 2:27:56 am
 @Email:  vargash1@wit.edu
 @Last modified by:   vargash1
-@Last modified time: Thursday, April 14th 2016, 6:17:29 pm
+@Last modified time: Thursday, April 14th 2016, 6:58:33 pm
 -->
 <form method="post" action="addtask">
     <!--  Task Title -->
@@ -37,7 +37,7 @@
     <br>
     <!--  Color choice -->
     <div class="text-center">
-        <label> Choose the Note Color! </label>
+        <label> Note Color </label>
         <div class="btn-group" data-toggle="buttons">
             {{#if allcolors}}
                 {{#each allcolors}}
@@ -49,6 +49,9 @@
             {{/if}}
         </div>
     </div>
+    <input type="hidden" name="txtclid" value="" readonly/>
+    <input type="hidden" name="bxid" value="" readonly/>
+    <br>
     <!-- Submit -->
     <div class ="divform">
         <button type="submit" class="button">
