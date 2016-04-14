@@ -3,7 +3,7 @@
 * @Date:   Wednesday, March 30th 2016, 5:34:31 pm
 * @Email:  vargash1@wit.edu
 * @Last modified by:   vargash1
-* @Last modified time: Wednesday, April 13th 2016, 10:50:59 pm
+* @Last modified time: Thursday, April 14th 2016, 3:46:33 pm
 */
 
 var express = require('express');
@@ -21,7 +21,7 @@ router.get('/',
     function(req, res, next) {
         if (req.user){
             fetchTasks(req,res,function(usertasks) {
-                res.render('user',{user: req.user,tasks:usertasks});
+                res.render('user',{user: req.user,kek: moment().format("HH:mm:ss"),tasks:usertasks});
             });
         } else {
             res.render('user',{user: req.user, tasks:[]});
@@ -696,7 +696,7 @@ router.post('/deletetask',
 
 // Poor mans text color setting when text is too dark
 function setTextColor(ncolor){
-    if (ncolor == "#000080" || ncolor == "black" || ncolor == "#2F4F4F"){
+    if (ncolor == "#000080" || ncolor == "black" || ncolor == "#2F4F4F" || ncolor == "0F37A9"){
         return "white";
     }
     return "black"
@@ -704,7 +704,7 @@ function setTextColor(ncolor){
 
 // Poor mans box shadow when text is too dark
 function setBoxShadow(ncolor){
-    if (ncolor == "#000080" || ncolor == "black" || ncolor == "#2F4F4F"){
+    if (ncolor == "#000080" || ncolor == "black" || ncolor == "#2F4F4F" || ncolor == "0F37A9"){
         return "0 4px 8px 0 rgba(255,255,255,0.24), 0 4px 8px 0  rgba(255,255,255,0.19)";
     }
     return "0 4px 8px 0 rgba(0,0,0,0.24),0 4px 8px 0 rgba(0,0,0,0.19)";
