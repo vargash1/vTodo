@@ -3,9 +3,10 @@
 @Date:   Thursday, March 31st 2016, 2:27:56 am
 @Email:  vargash1@wit.edu
 @Last modified by:   vargash1
-@Last modified time: Sunday, April 3rd 2016, 11:06:44 pm
+@Last modified time: Thursday, April 14th 2016, 6:17:29 pm
 -->
 <form method="post" action="addtask">
+    <!--  Task Title -->
     <div class="form-group row">
         <label for="taskT" class="col-sm-2 form-control-label">Task Title</label>
         <div class="col-sm-10">
@@ -13,22 +14,43 @@
         </div>
     </div>
     <div class="form-group row">
+        <!-- Task Date Due -->
         <label for="taskDD" class="col-sm-2 form-control-label">Date Due</label>
         <div class="col-sm-10">
             <input type="date" name="datedue" class="form-control" id="taskDD">
         </div>
     </div>
+    <!--  Task time due -->
     <div class="form-group row">
         <label for="taskTD" class="col-sm-2 form-control-label">Time Due</label>
         <div class="col-sm-10">
             <input type="time" name="timedue" class="form-control" id="taskTD" >
         </div>
     </div>
+    <!--  Task Body -->
     <div class = "divform">
         <label for="taskBD">Task Body</label>
         <br>
         <textarea  name="taskbody" cols="30"  wrap="hard" id="taskBD"></textarea>
         <br>
+    </div>
+    <br>
+    <!--  Color choice -->
+    <div class="text-center">
+        <label> Choose the Note Color! </label>
+        <div class="btn-group" data-toggle="buttons">
+            {{#if allcolors}}
+                {{#each allcolors}}
+                    <label class="btn btn-primary" style="background-color:{{colorcode}};">
+                        <input type="radio" name="color" autocomplete="off" value="{{colorcode}}">
+                        <i class="zmdi zmdi-circle zmdi-hc-fw" style="color: {{colorcode}};"></i>
+                    </label>
+                {{/each}}
+            {{/if}}
+        </div>
+    </div>
+    <!-- Submit -->
+    <div class ="divform">
         <button type="submit" class="button">
             <i class="zmdi zmdi-assignment"></i>  Add  Task
         </button>
