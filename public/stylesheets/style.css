@@ -3,7 +3,7 @@
 * @Date:   Wednesday, April 13th 2016, 6:46:33 pm
 * @Email:  vargash1@wit.edu
 * @Last modified by:   vargash1
-* @Last modified time: Thursday, April 14th 2016, 12:06:53 am
+* @Last modified time: Thursday, April 14th 2016, 4:18:25 pm
 */
 
 body {
@@ -19,7 +19,7 @@ body {
 }
 /*main buttons*/
 .button {
-    background-color: black;
+    background-color: #1793D1;
     border: none;
     color: white;
     padding: 10px 26px;
@@ -43,7 +43,7 @@ body {
 }
 .button:hover {
     font-size: 12px;
-    background-color: #1793D1;
+    background-color: black;
     box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24),0 17px 50px 0 rgba(0,0,0,0.19);
 }
 /*inline note buttons*/
@@ -281,7 +281,7 @@ blockquote {
     transition: transform .8s ease-in-out;
 }
 .fa-sticky-note:hover{
-    color: #1793D1;
+    color: black;
     -webkit-animation:spin 2s linear infinite;
     -moz-animation:spin 2s linear infinite;
     animation:spin 2s linear infinite;

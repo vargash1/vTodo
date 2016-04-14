@@ -3,7 +3,7 @@
 * @Date:   Wednesday, March 30th 2016, 5:34:31 pm
 * @Email:  vargash1@wit.edu
 * @Last modified by:   vargash1
-* @Last modified time: Thursday, April 14th 2016, 3:46:33 pm
+* @Last modified time: Thursday, April 14th 2016, 4:36:59 pm
 */
 
 var express = require('express');
@@ -13,6 +13,8 @@ var pg = require('pg')
 var bcrypt = require('bcryptjs');
 var Promise = require('promise');
 var moment = require('moment');
+var bunyan = require('bunyan');
+var log = bunyan.createLogger({name: "vTask"})
 require('dotenv').config();
 moment().format();
 
@@ -21,7 +23,7 @@ router.get('/',
     function(req, res, next) {
         if (req.user){
             fetchTasks(req,res,function(usertasks) {
-                res.render('user',{user: req.user,kek: moment().format("HH:mm:ss"),tasks:usertasks});
+                res.render('user',{user: req.user,tasks:usertasks});
             });
         } else {
             res.render('user',{user: req.user, tasks:[]});
@@ -148,7 +150,7 @@ function typeOf (obj) {
 
 // Fetches all tasks in database that belong to the user
 function fetchTasks(req, res, next){
-    console.log("[INFO] Connecting to Database");
+    log.info("Connecting to Database");
     pg.connect(process.env.CONSTRING, function(err,client,done){
         if(err){
             console.error("[INFO] Unable to Connect to Database");
@@ -171,6 +173,10 @@ function fetchTasks(req, res, next){
             }
         });
     });
+}
+// Fetches all availble colors in the database for note config
+function fetchColors(req, res, next){
+    log.info("Connecting to Database")
 }
 // Adds a task to the Database
 router.post('/addtask',
