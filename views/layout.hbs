@@ -3,7 +3,7 @@
 @Date:   Tuesday, March 29th 2016, 1:33:08 am
 @Email:  vargash1@wit.edu
 @Last modified by:   vargash1
-@Last modified time: Thursday, April 14th 2016, 10:01:24 pm
+@Last modified time: Friday, April 15th 2016, 6:24:51 am
 -->
 <!DOCTYPE html>
 <!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang=""> <![endif]-->
@@ -25,6 +25,8 @@
       <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
       <meta name="viewport" content="width=device-width, initial-scale=1">
       <link rel='stylesheet' href='/stylesheets/style.css'/>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.simpleWeather/3.1.0/jquery.simpleWeather.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.12.0/moment.min.js"></script>
       <script>
       $(document).ready(function() {
           $("[rel=popover]").popover({'trigger':'hover'});
@@ -75,6 +77,9 @@
         {{#unless msg}}
         <div class = "wrapper">
             <br>
+            Boston, MA <div id="weather"></div>
+            <i class="fa fa-clock-o fa-fw"></i> <span class="timer"></span>
+            <br>
             <a href="/users/addtask">
                 <button class = "button">
                     <i class="fa fa-plus-circle fa-fw"></i> Add Task
@@ -100,6 +105,25 @@
               <i class = "fa fa-github fa-fw"  title="Link to Github Repo"></i>
           </a>
     </div>
+    <script>
+    (function update_time(){
+        var now = moment().format('h:mm:ss a');
+        $('.timer').text(now);
+        setTimeout(update_time, 1000);
+    })();
+    $(document).ready(function() {
+        $.simpleWeather({
+            location: 'Boston, MA',
+            woeid: '',
+            unit: 'f',
+            success: function(weather) {
+                html = weather.temp+'&deg;'+weather.units.temp;
 
+                $("#weather").html(html);
+            }
+        });
+    });
+
+    </script>
 </body>
 </html>

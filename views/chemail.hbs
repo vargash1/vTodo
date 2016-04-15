@@ -3,19 +3,32 @@
 @Date:   Tuesday, March 29th 2016, 6:30:27 pm
 @Email:  vargash1@wit.edu
 @Last modified by:   vargash1
-@Last modified time: Saturday, April 2nd 2016, 6:04:15 pm
+@Last modified time: Friday, April 15th 2016, 5:58:19 am
 -->
 
+<form method="post" action="chemail">
+    <div class="form-group row">
+        <label for="email1" class="col-sm-2 form-control-label">New Email</label>
+        <div class="col-sm-10">
+            <input type="email" name="email" class="form-control" id="email1" placeholder="Email">
+        </div>
+    </div>
+    <div class="form-group row">
+        <label for="email2" class="col-sm-2 form-control-label">Confirm New Email</label>
+        <div class="col-sm-10">
+            <input type="email" name="emailc" class="form-control" id="email2" placeholder="Email">
+            <small class="text-muted">We'll never share your email with anyone else.</small>
+        </div>
+    </div>
+    <div class = "divform">
+        <button type="submit" class="button">
+            <i class="fa fa-envelope-o"></i> Change Email
+        </button>
+    </div>
+</form>
+
+
 <div class = "divform">
-    <form class = "centerform" method="post" action="chemail">
-        <input type="email" name="email">
-        <br>
-        <input type="email" name="emailc">
-        <br>
-        <input type="submit" class="button" value="Change Email">
-        <br>
-    </form>
-    <br>
     {{#if message}}
         <i class="fa fa-exclamation-triangle"></i> {{message}}
     {{/if}}
