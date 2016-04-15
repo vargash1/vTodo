@@ -3,7 +3,7 @@
 * @Date:   Wednesday, April 13th 2016, 6:46:33 pm
 * @Email:  vargash1@wit.edu
 * @Last modified by:   vargash1
-* @Last modified time: Thursday, April 14th 2016, 4:18:25 pm
+* @Last modified time: Thursday, April 14th 2016, 9:58:16 pm
 */
 
 body {
@@ -132,7 +132,7 @@ body {
     z-index: 100;
     bottom: 0;
     left: 0;
-    text-align: center;
+    text-align: right;
     width: 100%;
     color: black;
 }
@@ -198,7 +198,7 @@ blockquote {
   clear: both;
 }
 .grid-item--width2 {
-    width: 200px; #1793D1;
+    width: 200px;
 }
 .tooltip {
     position: relative;
@@ -223,7 +223,6 @@ blockquote {
     font-size: 10px;
     float: right;
 }
-/*font awesome stuff*/
 .fa-exclamation-triangle{
     animation: blinker 0.5s linear infinite;
     color:red;
@@ -231,12 +230,9 @@ blockquote {
 .zmdi-circle{
     font-size: 14px;
 }
-.zmdi-circle:hover{
-    animation: blinker 1s linear infinite;
-}
 .modal-header{
     color: white;
-    background: black;
+    background: #1793D1;
     text-align: center;
 }
 .close{
@@ -255,8 +251,8 @@ blockquote {
     -webkit-box-shadow: none;
 	-moz-box-shadow: none;
 	box-shadow: none;
-    -webkit-transform: rotate(720deg);
-    transform: rotate(720deg);
+    -webkit-transform: rotate(180deg);
+    transform: rotate(180deg);
 }
 .fa-plus-circle{
     -webkit-transition: -webkit-transform .8s ease-in-out;
@@ -277,16 +273,14 @@ blockquote {
     animation:spin 1s linear infinite;
 }
 .fa-sticky-note{
+    color: black;
     -webkit-transition: -webkit-transform .8s ease-in-out;
     transition: transform .8s ease-in-out;
-}
-.fa-sticky-note:hover{
-    color: black;
     -webkit-animation:spin 2s linear infinite;
     -moz-animation:spin 2s linear infinite;
     animation:spin 2s linear infinite;
-}
 
+}
 .btn {
      border-radius:0;
      border-color: rgba(0, 0, 0, 0.0);

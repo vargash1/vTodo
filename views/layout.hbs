@@ -3,7 +3,7 @@
 @Date:   Tuesday, March 29th 2016, 1:33:08 am
 @Email:  vargash1@wit.edu
 @Last modified by:   vargash1
-@Last modified time: Thursday, April 14th 2016, 3:59:51 pm
+@Last modified time: Thursday, April 14th 2016, 10:01:24 pm
 -->
 <!DOCTYPE html>
 <!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang=""> <![endif]-->
@@ -54,6 +54,7 @@
                   <li><a href="/users"><i class="fa fa-home"></i></a></li>
                   {{#if user.username}}
                     <li><a href="/users/settings"> {{user.username}} <i class="fa fa-cog fa-fw"></i> </a></li>
+                    <li><a href="/users/addtask">  Add Task <i class="fa fa-plus-circle fa-fw"></i> </a></li>
                   {{/if}}
               </ul>
               <ul class="nav navbar-nav navbar-right">
@@ -69,7 +70,7 @@
       </nav>
 
       <!-- Greeting -->
-      <br></br>
+
       {{#if user.username}}
         {{#unless msg}}
         <div class = "wrapper">
@@ -91,10 +92,14 @@
 
       <!--  Bottom Bar Fixed -->
       <div id="botbar">
+          <a href="https://github.com/vargash1/vTodoCLI">
+              <i class="fa fa-terminal" title="vTodoCLI"></i>
+          </a>
+
           <a href="https://github.com/vargash1/vTodo">
               <i class = "fa fa-github fa-fw"  title="Link to Github Repo"></i>
           </a>
-      </div>
+    </div>
 
 </body>
 </html>

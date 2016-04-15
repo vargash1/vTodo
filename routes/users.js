@@ -3,7 +3,7 @@
 * @Date:   Wednesday, March 30th 2016, 5:34:31 pm
 * @Email:  vargash1@wit.edu
 * @Last modified by:   vargash1
-* @Last modified time: Thursday, April 14th 2016, 9:24:47 pm
+* @Last modified time: Thursday, April 14th 2016, 10:07:16 pm
 */
 
 var express = require('express');
@@ -23,7 +23,9 @@ router.get('/',
     function(req, res, next) {
         if (req.user){
             fetchTasks(req,res,function(usertasks) {
-                res.render('user',{user: req.user,tasks:usertasks});
+                fetchColors(req, res, function(allcolors){
+                    res.render('user',{user: req.user,tasks:usertasks,allcolors:allcolors});
+                })
             });
         } else {
             res.render('user',{user: req.user, tasks:[]});
