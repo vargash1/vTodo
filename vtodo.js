@@ -3,7 +3,7 @@
 * @Date:   Monday, March 28th 2016, 3:29:51 pm
 * @Email:  vargash1@wit.edu
 * @Last modified by:   vargash1
-* @Last modified time: Sunday, April 3rd 2016, 5:36:24 pm
+* @Last modified time: Thursday, April 14th 2016, 9:03:48 pm
 */
 
 var express = require('express');
@@ -13,6 +13,8 @@ var bodyParser = require('body-parser');
 var methodOverride = require('method-override');
 var favicon = require('serve-favicon');
 var bcrypt = require('bcryptjs');
+var bunyan = require('bunyan');
+var log = bunyan.createLogger({name: "vTask"});
 var routes = require('./routes/index');
 var users = require('./routes/users');
 var pg = require('pg');
@@ -30,19 +32,20 @@ passport.use(new LocalStrategy({
 function(username,password,done){
     pg.connect(process.env.CONSTRING, function(err, client, next){
         if (err){
-            console.error("[INFO] Unable To Connect To Database");
+            log.debug({time: Date()}, err);
+            log.fatal({time: Date()}, "Unable To Connect To Database");
         }
-        console.log("[INFO] Connected to Database");
+        log.info({time: Date()}, "Connected to Database");
         client.query('SELECT * FROM users WHERE username=$1', [username], function(err, result) {
             next();
             if (result.rows.length > 0){
                 var matched = bcrypt.compareSync(password, result.rows[0].password);
                 if (matched) {
-                    console.log("[INFO] Successful Login");
+                    log.info({time: Date()}, "Successful Login");
                     return done(null, result.rows[0]);
                 }
             }
-            console.log("[INFO] Invalid Username or Password");
+            log.warn({time: Date()}, "Invalid Username or Password");
             return done(null, false);
         })
     });
@@ -55,11 +58,14 @@ passport.serializeUser(function(user, done) {
 
 // Get user information out of session
 passport.deserializeUser(function(id, done) {
+    log.info({time: Date()}, "Connecting to datbase");
     pg.connect(process.env.CONSTRING,function(err,client,next){
         client.query('SELECT id, username FROM users WHERE id = $1', [id], function(err, result) {
+            log.info({time: Date()}, "Releasing client back into pool");
             next()
             // Return the user
             if (result) {
+                log.info({time: Date()}, "User Found")
                 return done(null, result.rows[0]);
             }
             return done(null, false);

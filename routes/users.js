@@ -3,7 +3,7 @@
 * @Date:   Wednesday, March 30th 2016, 5:34:31 pm
 * @Email:  vargash1@wit.edu
 * @Last modified by:   vargash1
-* @Last modified time: Thursday, April 14th 2016, 8:44:48 pm
+* @Last modified time: Thursday, April 14th 2016, 8:57:52 pm
 */
 
 var express = require('express');
@@ -411,15 +411,20 @@ router.post('/signup',
 
 });
 
-// Handle password chinfonder('chpasswd',{
-            user:req.user,
-            message: "Invalid Password!",
-            rules: [
-                {rule: "Password must be at least 8 characters long"},
-                {rule: "Password must contain at least one Lowercase letter"},
-                {rule: "Password must contain at least one Uppercase letter"},
-                {rule: "Password must contain at least one Number"}
-            ]
+// Handle password change
+router.post('chpasswd',
+    function(req, res, next){
+        if (!validPassword(req.body.password) || !validPassword(req.body.passwordc)) {
+            log.warn({time: Date()},"Invalid password");
+            return res.render('chpasswd',{
+                user:req.user,
+                message: "Invalid Password!",
+                rules: [
+                    {rule: "Password must be at least 8 characters long"},
+                    {rule: "Password must contain at least one Lowercase letter"},
+                    {rule: "Password must contain at least one Uppercase letter"},
+                    {rule: "Password must contain at least one Number"}
+                ]
         });
     }
 
