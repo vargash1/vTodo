@@ -3,7 +3,7 @@
 @Date:   Tuesday, March 29th 2016, 1:33:08 am
 @Email:  vargash1@wit.edu
 @Last modified by:   vargash1
-@Last modified time: Friday, April 15th 2016, 6:24:51 am
+@Last modified time: Friday, April 15th 2016, 6:28:45 am
 -->
 <!DOCTYPE html>
 <!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang=""> <![endif]-->
@@ -107,7 +107,7 @@
     </div>
     <script>
     (function update_time(){
-        var now = moment().format('h:mm:ss a');
+        var now = moment().format('MMMM Do YYYY, h:mm:ss a');
         $('.timer').text(now);
         setTimeout(update_time, 1000);
     })();
