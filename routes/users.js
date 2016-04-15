@@ -3,7 +3,7 @@
 * @Date:   Wednesday, March 30th 2016, 5:34:31 pm
 * @Email:  vargash1@wit.edu
 * @Last modified by:   vargash1
-* @Last modified time: Thursday, April 14th 2016, 6:51:21 pm
+* @Last modified time: Thursday, April 14th 2016, 8:44:48 pm
 */
 
 var express = require('express');
@@ -14,7 +14,7 @@ var bcrypt = require('bcryptjs');
 var Promise = require('promise');
 var moment = require('moment');
 var bunyan = require('bunyan');
-var log = bunyan.createLogger({name: "vTask"})
+var log = bunyan.createLogger({name: "vTask"});
 require('dotenv').config();
 moment().format();
 
@@ -125,7 +125,7 @@ function validTaskBody(tbody){
 function validTime(ttime){
     var modtime = ttime.trim();
     if (modtime === ''){
-        log.info("Time Missing and will be set to Current Time");
+        log.info({time: Date()}, "Time Missing and will be set to Current Time");
         modtime = moment().format('HH:mm:ss');
         return modtime;
     }
@@ -136,9 +136,9 @@ function validTime(ttime){
 function validDate(tdate){
     var moddate = tdate.trim();
     if (moddate === ''){
-        log.info("Date Missing and will be set to tomorrow's Date!");
+        log.info({time: Date()}, "Date Missing and will be set to tomorrow's Date!");
         var tmmr = moment().add(1,'days');
-        moddate = tmmr.format('YYYY-MM-DD')
+        moddate = tmmr.format('YYYY-MM-DD');
         return moddate;
     }
     return tdate;
@@ -151,25 +151,26 @@ function typeOf (obj) {
 
 // Fetches all tasks in database that belong to the user
 function fetchTasks(req, res, next){
-    log.info("Connecting to Database");
+    log.info({time: Date()}, "Connecting to Database");
     pg.connect(process.env.CONSTRING, function(err,client,done){
         if(err){
-            log.error("Unable to Connect to Database");
+            log.debug({time: Date()},err);
+            log.fatal({time: Date()}, "Unable to Connect to Database");
         }
-        log.info("Connected to Database");
+        log.info({time: Date()}, "Connected to Database");
         client.query('SELECT noteid,title,to_char(datedue, \'MM-DD-YYYY\'),timedue,taskbody,colors,txtcolor,bxshadow FROM notes WHERE username=$1 ORDER BY noteid DESC',[req.user.username],
         function(err,result){
             if (err){
-                log.error(err);
-                log.error("Unable to Query Database");
+                log.debug({time: Date()},err);
+                log.fatal({time: Date()}, "Unable to Query Database");
             }
             else if (result.rows.length > 0){
                 done();
-                log.info("User's Tasks Found");
-                log.info("Released DB Client Back Into Pool");
+                log.info({time: Date()}, "User's Tasks Found");
+                log.info({time: Date()}, "Released DB Client Back Into Pool");
                 next(result.rows);
             }else{
-                log.warn(" No Tasks Where Found!");
+                log.warn({time: Date()}, "No Tasks Where Found!");
                 next([]);
             }
         });
@@ -178,25 +179,25 @@ function fetchTasks(req, res, next){
 
 // Fetches all availble colors in the database for note config
 function fetchColors(req, res, next){
-    log.info("Connecting to Database")
+    log.info({time: Date()},"Connecting to Database")
     pg.connect(process.env.CONSTRING, function(err, client, done){
         if (err){
-            log.error(err)
-            log.error("Unable to Connect to  Database")
+            log.debug({time: Date()}, err);
+            log.fatal({time: Date()}, "Unable to Connect to  Database");
         }
-        log.info("Connected to Database");
+        log.info({time: Date()}, "Connected to Database");
         client.query('SELECT colorcode from colorchoices', function(err, result){
             if (err){
-                log.error(err);
-                log.error("Unable to Query Database")
+                log.debug({time: Date()}, err);
+                log.fatal({time: Date()}, "Unable to Query Database");
             }
             else if (result.rows.length > 0){
                 done();
-                log.info("Returning Colors");
-                log.info("Released DB Client Back Into Pool");
+                log.info({time: Date()}, "Returning Colors");
+                log.info({time: Date()}, "Released DB Client Back Into Pool");
                 next(result.rows);
             } else {
-                log.fatal("No colors were found, this is an unexpected error");
+                log.fatal({time: Date()}, "No colors were found, this is an unexpected error");
                 next([]);
             }
         });
@@ -209,7 +210,7 @@ router.post('/addtask',
 
         //Reject invalid task body
         if (!validTaskBody(req.body.taskbody)){
-            console.log(" Invalid Task Body!");
+            log.warn({time: Date()}, "Invalid Task Body!");
             return res.render('addtask',{
                 user: req.user,
                 msg: "True",
@@ -227,9 +228,11 @@ router.post('/addtask',
         req.body.bxid = setBoxShadow(req.body.color);
 
         var db = new Promise(function(resolve,reject){
-        console.log(" Connecting to Database");
+        log.info({time: Date()}, "Connecting to Database");
         pg.connect(process.env.CONSTRING,function(err, client, next){
             if(err){
+                log.debug({time: Date()},err);
+                log.fatal({time: Date()}, "Unable to Connect to DB");
                 reject(Error("Unable to Connect to DB"));
             }
             else{
@@ -238,43 +241,45 @@ router.post('/addtask',
         });
         }).then(function(data) {
             return new Promise(function(resolve,reject){
-                console.log(" Querying Database");
+                log.info({time: Date()}, "Querying Database");
                 data.client.query('SELECT * FROM users WHERE username=$1',[req.user.username],
                 function(err,result){
                     if (err){
-                        console.log(err);
-                        console.error(" Unable to Query DB");
+                        log.debug({time: Date()}, err);
+                        log.fatal({time: Date()}, "Unable to Query DB");
                         reject(Error("Unable to Query DB"));
                     }
                     else if (result.rows.length === 1){
-                        console.log(" Proceeding to add user task");
+                        log.info({time: Date()}, "Proceeding to add user task");
                         resolve(data);
                     }
                     else{
-                        console.log("[WARN] User not Found!");
-                        reject(Error("User does not exist, Unexpected error!"))
+                        log.fatal({time: Date()}, "User not Found, Unexpected error!");
+                        reject(Error("User does not exist, Unexpected error!"));
                     }
                 });
             });
         });
         Promise.all([db]).then(function(data) {
-            console.log(" Querying Database");
+            log.info({time: Date()}, "Querying Database");
             data[0].client.query('INSERT INTO notes (username,title,datedue,timedue,taskbody,colors,txtcolor,bxshadow) VALUES($1,$2,$3,$4,$5,$6,$7,$8)',
             [req.user.username, req.body.tasktitle, req.body.datedue, req.body.timedue, req.body.taskbody, req.body.color, req.body.txtclid ,req.body.bxid],
             function(err, result) {
                 if(err){
-                    console.log(" Unable To Insert Note into Database");
-                    console.error(err);
+                    log.debug({time: Date()},err);
+                    log.fatal({time: Date()}, "Unable To Insert Note into Database");
+                    error(err);
                 }
                 data[0].next();
-                console.log(" Released Client Back Into Pool");
+                log.info({time: Date()}, "Released Client Back Into Pool");
                 fetchTasks(req,res,function(usertasks){
                     res.render('user',{user:req.user,tasks:usertasks});
                 });
             });
         },function(reason){
-            console.log(" Unable to Create Task");
-            res.render('addtask',{user : req.user,message:reason})
+            log.error({time: Date()}, "Unable to Create Task");
+            log.debug({time: Date()},reason);
+            res.render('addtask',{user : req.user,message:reason});
         });
 });
 
@@ -308,7 +313,7 @@ router.post('/signup',
 
     // Reject invalid username
     if (!validUsername(req.body.username)) {
-        console.log(" Invalid Username!");
+        log.warn({time: Date()}, "Invalid Username!");
         return res.render('signup',{
             message: "Invalid Username!",
             rules: [
@@ -320,7 +325,7 @@ router.post('/signup',
 
     //Reject invalid emails
     if (!validEmail(req.body.email)){
-        console.log(" Invalid Email");
+        log.warn({time: Date()}, "Invalid Email");
         return res.render('signup',{
             message: "Invalid Email!",
             rules:[
@@ -332,7 +337,7 @@ router.post('/signup',
 
     // Reject weak passwords
     if (!validPassword(req.body.password)) {
-        console.log(" Invalid Password");
+        log.warn({time: Date()}, "Invalid Password");
         return res.render('signup',{
             message: "Invalid Password!",
             rules: [
@@ -347,15 +352,17 @@ router.post('/signup',
     // Generate a hashed password
     var hashedPassword = new Promise(function(resolve, reject){
       var salt = bcrypt.genSaltSync(10);
-      console.log(" Hash Passwords");
+      log.debug({time: Date()}, "Hashing Password");
       resolve(bcrypt.hashSync(req.body.password, salt));
     });
 
     // Connect to database
     var db = new Promise(function(resolve, reject) {
     pg.connect(process.env.CONSTRING,function(err, client, next) {
-        console.log(" Connecting to Database");
+        log.info({time: Date()}, " Connecting to Database");
         if (err) {
+            log.fatal({time: Date()}, "Unable to connect to database");
+            log.debug({time: Date()},err);
             reject(Error("Unable to connect to database"));
         }
         else {
@@ -365,52 +372,46 @@ router.post('/signup',
   }).then(function(data) {
       // Check if they're already a user
       return new Promise(function(resolve, reject) {
-        console.log(" Querying DB for Username Availability");
+        log.debug({time: Date()}, "Checking for Username Availability");
         data.client.query('SELECT * FROM users WHERE username=$1 or email=$2',[req.body.username,req.body.email],
             function(err, result) {
                 if (err) {
-                    console.log(err);
-                    console.log(" Unable to Query DB");
+                    log.debug({time: Date()}, err);
+                    log.fatal({time: Date()}, "Unable to Query DB");
                     reject(Error("Unable to query database"));
                 }
                 else if (result.rows.length > 0) {
                     data.next();
-                    console.log(" Released Client Back Into Pool");
-                    console.log(" User with Username or Email Already Exists");
+                    log.info({time: Date()}, "Released Client Back Into Pool");
+                    log.warn({time: Date()}, "User with Username or Email Already Exists");
                     reject(Error("Username or Email Already In Use!"));
                 }
                 else {
-                    console.log(" Username and Email Available.");
+                    log.info({time: Date()}, "Username and Email Available.");
                     resolve(data);
                 }
             });
         });
     });
     Promise.all([hashedPassword, db]).then(function(data) {
-        console.log(" Querying Database");
+        log.info({time: Date()}, "Querying Database");
         data[1].client.query('INSERT INTO users (username,email,password) VALUES($1,$2,$3)',[req.body.username, req.body.email, data[0]],
             function(err, result) {
                 data[1].next();
-                console.log(" Created New Account!");
-                console.log(" Released Client Back Into Pool");
+                log.info({time: Date()}, "Created New Account!");
+                log.info({time: Date()}, "Released Client Back Into Pool");
                 var msg = 'Successful Signup, Please sign in to your account '.concat([req.body.username]);
                 res.render('login',{message: msg});
             });
     },function(reason){
-      console.log(" Unable to Create Account");
-      res.render('signup',{message:reason})
+      log.warn({time: Date()}, "Unable to Create Account");
+      log.debug({time: Date()}, reason);
+      res.render('signup',{message:reason});
     });
 
 });
 
-// Handle password change
-router.post('/chpasswd',
-  function(req, res, next) {
-
-    // Reject weak passwords
-    if (!validPassword(req.body.password) || !validPassword(req.body.passwordc)) {
-        console.log(" Invalid Password");
-        return res.render('chpasswd',{
+// Handle password chinfonder('chpasswd',{
             user:req.user,
             message: "Invalid Password!",
             rules: [
@@ -423,7 +424,7 @@ router.post('/chpasswd',
     }
 
     if(req.body.password != req.body.passwordc){
-        console.log(" Passwords don't Match!");
+        log.warn({time: Date()}, "Passwords don't Match!");
         return res.render('chpasswd',{
             user:req.user,
             message: "Passwords Don't Match!",
@@ -436,15 +437,17 @@ router.post('/chpasswd',
     // Generate a hashed password
     var hashedPassword = new Promise(function(resolve, reject){
       var salt = bcrypt.genSaltSync(10);
-      console.log(" Hash Passwords");
+      log.debug({time: Date()}, " Hashing Passwords");
       resolve(bcrypt.hashSync(req.body.password, salt));
     });
 
     // Connect to database
     var db = new Promise(function(resolve, reject) {
     pg.connect(process.env.CONSTRING,function(err, client, next) {
-        console.log(" Connecting to Database");
+        log.info({time: Date()}, "Connecting to Database");
         if (err) {
+            log.debug({time: Date()},err);
+            log.fatal({time: Date()}, "Unable to connect to database");
             reject(Error("Unable to connect to database"));
         }
         else {
@@ -454,41 +457,42 @@ router.post('/chpasswd',
   }).then(function(data) {
       // Check if Account exists
       return new Promise(function(resolve, reject) {
-        console.log(" Querying DB for Username Availability");
+        log.debug({time: Date()}, "Querying DB for Username Availability");
         data.client.query('SELECT * FROM users WHERE username=$1',[req.user.username],
             function(err, result) {
                 if (err) {
-                    console.log(err);
-                    console.log(" Unable to Query DB");
+                    log.debug({time: Date()}, err);
+                    log.fatal({time: Date()}, "Unable to Query DB");
                     reject(Error("Unable to query database"));
                 }
                 else if (result.rows.length == 1){
-                    console.log(" Username Found, Proceeding to change Password");
+                    log.info({time: Date()}, "Username Found, Proceeding to change Password");
                     resolve(data);
                 }
                 else {
                     data.next();
-                    console.log(" Released Client Back Into Pool");
-                    console.log(" User with Username Does Not Exist");
+                    log.debug({time: Date()}, "Released Client Back Into Pool");
+                    log.warn({time: Date()}, "User with Username Does Not Exist");
                     reject(Error(" User with Username Does Not Exist, Unexpected Error"));
                 }
             });
         });
     });
     Promise.all([hashedPassword, db]).then(function(data) {
-        console.log(" Querying Database");
+        log.info({time: Date()}, "Querying Database");
         data[1].client.query('UPDATE users SET password=$1 WHERE username=$2',[data[0],req.user.username],
             function(err, result) {
                 data[1].next();
-                console.log(" Updated Account Info");
-                console.log(" Released Client Back Into Pool");
+                log.info({time: Date()}, "Updated Account Info");
+                log.info({time: Date()}, "Released Client Back Into Pool");
                 msg = 'Password has been Successfully Changed. You must now log in.';
                 req.logout();
                 res.render('user',{message: msg, tasks:[]});
             });
     },function(reason){
-      console.log(" Unable to Change Passwords");
-      res.render('settings',{user : req.user,message:reason})
+      log.error({time: Date()}, "Unable to Change Passwords");
+      log.debug({time: Date()},reason);
+      res.render('settings',{user : req.user,message:reason});
     });
 
 });
@@ -498,7 +502,7 @@ router.post('/chemail',
 
      // Reject invalid email
     if (!validEmail(req.body.email) || !validEmail(req.body.emailc)) {
-        console.log(" Invalid Email");
+        log.warn({time: Date()}, "Invalid Email");
         return res.render('chpasswd',{
             user:req.user,
             message: "Invalid Email",
@@ -509,7 +513,7 @@ router.post('/chemail',
     }
 
     if(req.body.email != req.body.emailc){
-        console.log(" Passwords don't Match!");
+        log.warn({time: Date()}, "Passwords don't Match!");
         return res.render('chemail',{
             user:req.user,
             message: "Emails Don't Match!",
@@ -521,8 +525,10 @@ router.post('/chemail',
     // Connect to database
     var db = new Promise(function(resolve, reject) {
     pg.connect(process.env.CONSTRING,function(err, client, next) {
-        console.log(" Connecting to Database");
+        log.info({time: Date()}, " Connecting to Database");
         if (err) {
+            log.debug({time: Date()}, err);
+            log.fatal("Unable to connect to database");
             reject(Error("Unable to connect to database"));
         }
         else {
@@ -532,66 +538,70 @@ router.post('/chemail',
   }).then(function(data) {
       // First check if account exists.
       return new Promise(function(resolve, reject) {
-        console.log(" Querying DB for Username Availability");
+        log.info({time: Date()}, "Querying DB for Username Availability");
         data.client.query('SELECT * FROM users WHERE username=$1',[req.user.username],
             function(err, result) {
                 if (err) {
-                    console.log(err);
-                    console.log(" Unable to Query DB");
+                    log.debug(err);
+                    log.fatal({time: Date()}, "Unable to Query DB");
                     reject(Error("Unable to query database"));
                 }
                 else if (result.rows.length === 1){
-                    console.log(" Username Found, Proceeding to change email");
+                    log.info({time: Date()}, "Username Found, Proceeding to change email");
                     resolve(data);
                 }
                 else {
                     data.next();
-                    console.log(" Released Client Back Into Pool");
-                    console.log(" User with Username Does Not Exist");
+                    log.info({time: Date()}, "Released Client Back Into Pool");
+                    log.fatal({time: Date()}, "User with Username Does Not Exist");
                     reject(Error(" User with Username Does Not Exist, Unexpected Error"));
                 }
             });
         });
     });
     Promise.all([db]).then(function(data) {
-        console.log(" Querying Database");
+        log.info({time: Date()}, "Querying Database");
         data[0].client.query('UPDATE users SET email=$1 WHERE username=$2',[req.body.email,req.user.username],
             function(err, result) {
                 data[0].next();
-                console.log(" Updated Account Info");
-                console.log(" Released Client Back Into Pool");
+                log.info({time: Date()}, "Updated Account Info");
+                log.info({time: Date()}, "Released Client Back Into Pool");
                 var msg = 'Email has been Successfully Changed';
                 fetchTasks(req,res,function(usertasks){
                     res.render('user',{user: req.user, message: msg, tasks: usertasks});
                 });
             });
     },function(reason){
-      console.log(" Unable to Change Email");
-      res.render('settings',{message:reason})
+      log.error({time: Date()}, "Unable to Change Email");
+      log.debug({time: Date()}, reason);
+      res.render('settings',{message:reason});
     });
 });
 
 // Be careful with the data returned from this puppy
 function fetchInfo(req, res, next){
     pg.connect(process.env.CONSTRING,function(err, client, done){
-        console.log(" Connecting to Database");
+        log.info({time: Date()}, "Connecting to Database");
         if (err){
+            log.debug({time: Date()}, err);
+            log.fatal({time: Date()}, "Unable to connect to database");
             reject(Error("Unable to connect to database"));
         }
         else {
             client.query('SELECT * FROM users,notes WHERE users.username=$1 AND notes.username=$1',[req.user.username],
             function(err,result){
                 if (err){
-                    console.error(" Unable to Query DB");
+                    log.debug({time: Date()}, err);
+                    log.fatal({time: Date()}, "Unable to Query DB");
                 }
                 else if (result.rows.length >= 0){
                     done();
-                    console.log(" Released Client Back Into Pool");
-                    console.log(" User Info Found");
+                    log.info({time: Date()}, "Released Client Back Into Pool");
+                    log.info({time: Date()}, "User Info Found");
                     next(result.rows);
                 }
                 else{
-                    console.log(" Unexpected Error");
+                    log.fatal({time: Date()}, "Unexpected Error when fetching user information");
                 }
             });
         }
@@ -603,7 +613,7 @@ router.post('/modifytask',
 
         //Reject invalid task body
         if (!validTaskBody(req.body.taskbody)){
-            console.log(" Invalid Task Body!");
+            log.warn({time: Date()}, "Invalid Task Body!");
             return res.redirect('/users');
         }
 
@@ -611,9 +621,11 @@ router.post('/modifytask',
         req.body.timedue = validTime(req.body.timedue);
 
         var db = new Promise(function(resolve,reject){
-        console.log(" Connecting to Database");
+        log.info({time: Date()}, "Connecting to Database");
         pg.connect(process.env.CONSTRING,function(err, client, next){
             if(err){
+                log.debug({time: Date()}, err)
+                log.fatal({time: Date()}, "Unable to connect to database")
                 reject(Error("Unable to Connect to DB"));
             }
             else{
@@ -622,21 +634,21 @@ router.post('/modifytask',
         });
         }).then(function(data) {
             return new Promise(function(resolve,reject){
-                console.log(" Querying Database");
+                log.info({time: Date()}, "Querying Database");
                 data.client.query('SELECT * FROM users WHERE username=$1',[req.user.username],
                 function(err,result){
                     if (err){
-                        console.log(err);
-                        console.error(" Unable to Query DB");
+                        log.debug({time: Date()}, err);
+                        log.fatal({time: Date()}, "Unable to Query DB");
                         reject(Error("Unable to Query DB"));
                     }
                     else if (result.rows.length === 1){
-                        console.log(" User Found");
-                        console.log(" Released Client Back Into Pool");
+                        log.info({time: Date()}, "User Found");
+                        log.info({time: Date()}, "Released Client Back Into Pool");
                         resolve(data);
                     }
                     else{
-                        console.log("[WARN] User not Found!!");
+                        log.fatal({time: Date()}, "User not Found, unexpected error. How did you get here?");
                         reject(Error("User does not exist, Unexpected error!"));
                         data.next();
                     }
@@ -644,23 +656,24 @@ router.post('/modifytask',
             });
         });
         Promise.all([db]).then(function(data) {
-            console.log(" Updating Task Info");
+            log.info({time: Date()}, " Updating Task Info");
             data[0].client.query('UPDATE notes SET title=$1, datedue=$2, timedue=$3, taskbody=$4 WHERE username=$5 AND noteid=$6',
             [req.body.tasktitle, req.body.datedue, req.body.timedue, req.body.taskbody,req.user.username,req.body.dbid],
             function(err, result) {
                 if(err){
-                    console.log(" Unable To Insert Note into Database");
-                    console.error(err);
+                    log.fatal({time: Date()}, "Unable To Insert Note into Database");
+                    log.debug({time: Date()}, err);
                 }
                 data[0].next();
-                console.log(" Updated Task!");
-                console.log(" Released Client Back Into Pool");
+                log.info({time: Date()}, "Updated Task!");
+                log.info({time: Date()}, "Released Client Back Into Pool");
                 fetchTasks(req,res,function(usertasks){
                         res.render('user',{ user:req.user, tasks:usertasks });
                 });
             });
         },function(reason){
-            console.log(" Unable to Modify Task");
+            log.error({time: Date()}, "Unable to Modify Task");
+            log.debug({time: Date()}, reason);
             fetchTasks(req,res,function(usertasks){
                 res.render('user',{ user: req.user, tasks:usertasks });
             });
@@ -671,9 +684,11 @@ router.post('/deletetask',
     function(req, res, next){
 
         var db = new Promise(function(resolve,reject){
-        console.log(" Connecting to Database");
+        log.info({time: Date()}, "Connecting to Database");
         pg.connect(process.env.CONSTRING,function(err, client, next){
             if(err){
+                log.fatal({time: Date()}, "Unable to connect to database");
+                log.debug({time: Date()}, err);
                 reject(Error("Unable to Connect to DB"));
             }
             else{
@@ -682,21 +697,21 @@ router.post('/deletetask',
         });
         }).then(function(data) {
             return new Promise(function(resolve,reject){
-                console.log(" Querying Database");
+                log.info({time: Date()}, "Querying Database");
                 data.client.query('SELECT * FROM notes WHERE noteid=$1 AND username=$2',[req.body.dbid,req.user.username],
                 function(err,result){
                     if (err){
-                        console.log(err);
-                        console.error(" Unable to Query DB");
+                        log.debug({time: Date()}, err);
+                        log.fatal({time: Date()}, "Unable to Query DB");
                         reject(Error("Unable to Query DB"));
                     }
                     else if (result.rows.length === 1){
-                        console.log(" Task Found");
-                        console.log(" Released Client Back Into Pool");
+                        log.info({time: Date()}, "Task Found");
+                        log.info({time: Date()}, "Released Client Back Into Pool");
                         resolve(data);
                     }
                     else{
-                        console.log(" Task Title Does Not Exist");
+                        log.fatal("Task Title Does Not Exist. This is unexpected. How did you get here?");
                         reject(Error("Unexpected Error: Task Title Does Not Exist"));
                         data.next();
                     }
@@ -704,23 +719,24 @@ router.post('/deletetask',
             });
         });
         Promise.all([db]).then(function(data) {
-            console.log(" Updating Task Info");
+            log.info({time: Date()}, "Updating Task Info");
             data[0].client.query('DELETE FROM notes WHERE noteid=$1 AND username=$2',
             [req.body.dbid,req.user.username],
             function(err, result) {
                 if(err){
-                    console.log(" Unable To Delete Note from Database");
-                    console.error(err);
+                    log.fatal({time: Date()}, "Unable To Delete Note from Database");
+                    log.debug({time: Date()}, err);
                 }
                 data[0].next();
-                console.log(" Deleted Task!");
-                console.log(" Released Client Back Into Pool");
+                log.info({time: Date()}, "Deleted Task!");
+                log.info({time: Date()}, "Released Client Back Into Pool");
                 fetchTasks(req,res,function(usertasks){
                         res.render('user',{ user:req.user, tasks:usertasks });
                 });
             });
         },function(reason){
-            console.log(" Unable to Delete Task!");
+            log.error({time: Date()}, "Unable to Delete Task!");
+            log.debug({time: Date()}, reason);
             fetchTasks(req,res,function(usertasks){
                 res.render('user',{ user: req.user, tasks:usertasks });
             });
@@ -743,16 +759,18 @@ function setBoxShadow(ncolor){
     return "0 4px 8px 0 rgba(0,0,0,0.24),0 4px 8px 0 rgba(0,0,0,0.19)";
 }
 
-// Deletes an existing task in the Database
+// changes an existing task color in the Database
 router.post('/changecolor',
     function(req, res, next){
         req.body.txtclid = setTextColor(req.body.color);
         req.body.bxid = setBoxShadow(req.body.color);
 
         var db = new Promise(function(resolve,reject){
-        console.log(" Connecting to Database");
+        log.info({time: Date()}, "Connecting to Database");
         pg.connect(process.env.CONSTRING,function(err, client, next){
             if(err){
+                log.fatal({time: Date()}, "Unable to connect to database");
+                log.debug({time: Date()}, err);
                 reject(Error("Unable to Connect to DB"));
             }
             else{
@@ -761,21 +779,21 @@ router.post('/changecolor',
         });
         }).then(function(data) {
             return new Promise(function(resolve,reject){
-                console.log(" Querying Database");
+                log.info({time: Date()},"Querying Database");
                 data.client.query('SELECT * FROM notes WHERE noteid=$1 AND username=$2',[req.body.dbid,req.user.username],
                 function(err,result){
                     if (err){
-                        console.log(err);
-                        console.error(" Unable to Query DB");
+                        log.debug({time: Date()},err);
+                        log.fatal({time: Date()},"Unable to Query DB");
                         reject(Error("Unable to Query DB"));
                     }
                     else if (result.rows.length === 1){
-                        console.log(" Task Found");
-                        console.log(" Released Client Back Into Pool");
+                        log.info({time: Date()},"Task Found");
+                        log.info({time: Date()},"Released Client Back Into Pool");
                         resolve(data);
                     }
                     else{
-                        console.log(" Task Title Does Not Exist");
+                        log.fatal({time: Date()},"Task Title Does Not Exist. Unexpected error");
                         reject(Error("Unexpected Error: Task Title Does Not Exist"));
                         data.next();
                     }
@@ -783,23 +801,24 @@ router.post('/changecolor',
             });
         });
         Promise.all([db]).then(function(data) {
-            console.log(" Updating Task Info");
+            log.info({time: Date()},"Updating Task Info");
             data[0].client.query('UPDATE notes SET colors=$1,txtcolor=$2,bxshadow=$3 WHERE noteid=$4 AND username=$5',
             [req.body.color,req.body.txtclid,req.body.bxid,req.body.dbid,req.user.username],
             function(err, result) {
                 if(err){
-                    console.log(" Unable To Delete Note from Database");
-                    console.error(err);
+                    log.fatal({time: Date()},"Unable To Delete Note from Database");
+                    log.debug({time: Date()},err);
                 }
                 data[0].next();
-                console.log(" Changed Task Color");
-                console.log(" Released Client Back Into Pool");
+                log.info({time: Date()},"Changed Task Color");
+                log.info({time: Date()},"Released Client Back Into Pool");
                 fetchTasks(req,res,function(usertasks){
                         res.render('user',{ user:req.user, tasks:usertasks });
                 });
             });
         },function(reason){
-            console.log(" Unable to Delete Task!");
+            log.error({time: Date()},"Unable to update task color. Unexpected error");
+            log.debug({time: Date()},reason);
             fetchTasks(req,res,function(usertasks){
                 res.render('user',{ user: req.user, tasks:usertasks });
             });
