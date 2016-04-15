@@ -3,7 +3,7 @@
 * @Date:   Wednesday, March 30th 2016, 5:34:31 pm
 * @Email:  vargash1@wit.edu
 * @Last modified by:   vargash1
-* @Last modified time: Thursday, April 14th 2016, 10:07:16 pm
+* @Last modified time: Thursday, April 14th 2016, 10:59:45 pm
 */
 
 var express = require('express');
@@ -25,7 +25,7 @@ router.get('/',
             fetchTasks(req,res,function(usertasks) {
                 fetchColors(req, res, function(allcolors){
                     res.render('user',{user: req.user,tasks:usertasks,allcolors:allcolors});
-                })
+                });
             });
         } else {
             res.render('user',{user: req.user, tasks:[]});
@@ -70,7 +70,9 @@ router.post('/login',
   function(req, res, next) {
       if (req.user){
           fetchTasks(req,res,function(usertasks) {
-              res.render('user',{user: req.user, tasks:usertasks});
+              fetchColors(req, res, function(allcolors){
+                  res.render('user',{user: req.user, tasks:usertasks, allcolors:allcolors});
+              });
         });
       }
   });
@@ -95,7 +97,9 @@ router.get('/signup',
     // If logged in, go to profile page
     if(req.user) {
         fetchTasks(req,res,function(usertasks){
-            res.render('user',{user: req.user, tasks:usertasks});
+            fetchColors(req,res,function(allcolors){
+                res.render('user',{user: req.user, tasks:usertasks, allcolors:allcolors});s
+            });
         });
     }
     res.render('signup',{user: req.user});
@@ -113,7 +117,9 @@ router.get('/modifytask',
     loggedIn,
     function(req,res){
         fetchTasks(req,res,function(usertasks){
-            res.render('user',{user: req.user, tasks:usertasks});
+            fetchColors(req,res,function(allcolors){
+                res.render('user',{user: req.user, tasks:usertasks, allcolors:allcolors});
+            });
         });
     });
 
@@ -278,13 +284,19 @@ router.post('/addtask',
                 data[0].next();
                 log.info({time: Date()}, "Released Client Back Into Pool");
                 fetchTasks(req,res,function(usertasks){
-                    res.render('user',{user:req.user,tasks:usertasks});
+                    fetchColors(req,res,function(allcolors){
+                        res.render('user',{user: req.user, tasks:usertasks, allcolors:allcolors});
+                    });
                 });
             });
         },function(reason){
             log.error({time: Date()}, "Unable to Create Task");
             log.debug({time: Date()},reason);
-            res.render('addtask',{user : req.user,message:reason});
+            fetchTasks(req,res,function(usertasks){
+                fetchColors(req,res,function(allcolors){
+                    res.render('user',{user: req.user, tasks:usertasks, allcolors:allcolors});
+                });
+            });
         });
 });
 
@@ -504,6 +516,7 @@ router.post('/chpasswd',
     },function(reason){
       log.error({time: Date()}, "Unable to Change Passwords");
       log.debug({time: Date()},reason);
+
       res.render('settings',{user : req.user,msg: "True",message:reason});
     });
 
@@ -582,7 +595,9 @@ router.post('/chemail',
                 log.info({time: Date()}, "Released Client Back Into Pool");
                 var msg = 'Email has been Successfully Changed';
                 fetchTasks(req,res,function(usertasks){
-                    res.render('user',{user: req.user, message: msg, tasks: usertasks});
+                    fetchColors(req,res,function(allcolors){
+                        res.render('user',{user: req.user, message: msg, tasks:usertasks, allcolors:allcolors});
+                    });
                 });
             });
     },function(reason){
@@ -621,6 +636,7 @@ function fetchInfo(req, res, next){
         }
     });
 }
+
 // Modifies an existing task in the Database
 router.post('/modifytask',
     function(req, res, next){
@@ -682,14 +698,18 @@ router.post('/modifytask',
                 log.info({time: Date()}, "Updated Task!");
                 log.info({time: Date()}, "Released Client Back Into Pool");
                 fetchTasks(req,res,function(usertasks){
-                        res.render('user',{ user:req.user, tasks:usertasks });
+                    fetchColors(req,res,function(allcolors){
+                        res.render('user',{user: req.user, tasks:usertasks, allcolors:allcolors});
+                    });
                 });
             });
         },function(reason){
             log.error({time: Date()}, "Unable to Modify Task");
             log.debug({time: Date()}, reason);
             fetchTasks(req,res,function(usertasks){
-                res.render('user',{ user: req.user, tasks:usertasks });
+                fetchColors(req,res,function(allcolors){
+                    res.render('user',{user: req.user, tasks:usertasks, allcolors:allcolors});
+                });
             });
         });
 });
@@ -745,14 +765,18 @@ router.post('/deletetask',
                 log.info({time: Date()}, "Deleted Task!");
                 log.info({time: Date()}, "Released Client Back Into Pool");
                 fetchTasks(req,res,function(usertasks){
-                        res.render('user',{ user:req.user, tasks:usertasks });
+                    fetchColors(req,res,function(allcolors){
+                        res.render('user',{user: req.user, tasks:usertasks, allcolors:allcolors});
+                    });
                 });
             });
         },function(reason){
             log.error({time: Date()}, "Unable to Delete Task!");
             log.debug({time: Date()}, reason);
             fetchTasks(req,res,function(usertasks){
-                res.render('user',{ user: req.user, tasks:usertasks });
+                fetchColors(req,res,function(allcolors){
+                    res.render('user',{user: req.user, tasks:usertasks, allcolors:allcolors});
+                });
             });
         });
 });
@@ -827,14 +851,18 @@ router.post('/changecolor',
                 log.info({time: Date()},"Changed Task Color");
                 log.info({time: Date()},"Released Client Back Into Pool");
                 fetchTasks(req,res,function(usertasks){
-                        res.render('user',{ user:req.user, tasks:usertasks });
+                    fetchColors(req,res,function(allcolors){
+                        res.render('user',{user: req.user, tasks:usertasks, allcolors:allcolors});
+                    });
                 });
             });
         },function(reason){
             log.error({time: Date()},"Unable to update task color. Unexpected error");
             log.debug({time: Date()},reason);
             fetchTasks(req,res,function(usertasks){
-                res.render('user',{ user: req.user, tasks:usertasks });
+                fetchColors(req,res,function(allcolors){
+                    res.render('user',{user: req.user, tasks:usertasks, allcolors:allcolors});
+                });
             });
         });
 });
