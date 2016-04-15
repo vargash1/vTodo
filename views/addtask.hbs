@@ -3,8 +3,18 @@
 @Date:   Thursday, March 31st 2016, 2:27:56 am
 @Email:  vargash1@wit.edu
 @Last modified by:   vargash1
-@Last modified time: Thursday, April 14th 2016, 8:45:03 pm
+@Last modified time: Thursday, April 14th 2016, 9:10:35 pm
 -->
+<div class = "divform">
+    {{#if message}}
+        <i class="fa fa-exclamation-triangle"></i> {{message}} <br>
+    {{/if}}
+    {{#if rules}}
+        {{#each rules}}
+            {{rule}}<br>
+        {{/each}}
+    {{/if}}
+</div>
 <form method="post" action="addtask">
     <!--  Task Title -->
     <div class="form-group row">
@@ -59,13 +69,3 @@
         </button>
     </div>
 </form>
-<div class = "divform">
-    {{#if message}}
-        <i class="fa fa-exclamation-triangle"></i> {{message}} <br>
-    {{/if}}
-    {{#if rules}}
-        {{#each rules}}
-            {{rule}}<br>
-        {{/each}}
-    {{/if}}
-</div>

@@ -3,7 +3,7 @@
 * @Date:   Wednesday, March 30th 2016, 5:34:31 pm
 * @Email:  vargash1@wit.edu
 * @Last modified by:   vargash1
-* @Last modified time: Thursday, April 14th 2016, 8:57:52 pm
+* @Last modified time: Thursday, April 14th 2016, 9:24:47 pm
 */
 
 var express = require('express');
@@ -211,15 +211,19 @@ router.post('/addtask',
         //Reject invalid task body
         if (!validTaskBody(req.body.taskbody)){
             log.warn({time: Date()}, "Invalid Task Body!");
-            return res.render('addtask',{
-                user: req.user,
-                msg: "True",
-                message: "Invalid Task Body!",
-                rules: [
-                     {rule: "Task Body must contain at least 3 characters!"},
-                     {rule: "Task Body cannot be empty!"}
-                ]
+            fetchColors(req, res, function(allcolors){
+                return res.render('addtask',{
+                    user: req.user,
+                    msg: "True",
+                    message: "Invalid Task Body!",
+                    allcolors: allcolors,
+                    rules: [
+                         {rule: "Task Body must contain at least 3 characters!"},
+                         {rule: "Task Body cannot be empty!"}
+                    ]
+                });
             });
+            return;
         }
 
         req.body.datedue = validDate(req.body.datedue);
@@ -266,9 +270,8 @@ router.post('/addtask',
             [req.user.username, req.body.tasktitle, req.body.datedue, req.body.timedue, req.body.taskbody, req.body.color, req.body.txtclid ,req.body.bxid],
             function(err, result) {
                 if(err){
-                    log.debug({time: Date()},err);
+                    log.debug({time: Date()},{err:err});
                     log.fatal({time: Date()}, "Unable To Insert Note into Database");
-                    error(err);
                 }
                 data[0].next();
                 log.info({time: Date()}, "Released Client Back Into Pool");
@@ -412,12 +415,13 @@ router.post('/signup',
 });
 
 // Handle password change
-router.post('chpasswd',
+router.post('/chpasswd',
     function(req, res, next){
         if (!validPassword(req.body.password) || !validPassword(req.body.passwordc)) {
             log.warn({time: Date()},"Invalid password");
             return res.render('chpasswd',{
                 user:req.user,
+                msg: "True",
                 message: "Invalid Password!",
                 rules: [
                     {rule: "Password must be at least 8 characters long"},
@@ -432,6 +436,7 @@ router.post('chpasswd',
         log.warn({time: Date()}, "Passwords don't Match!");
         return res.render('chpasswd',{
             user:req.user,
+            msg: "True",
             message: "Passwords Don't Match!",
             rules: [
                 {rule: "Passwords Must Match!"}
@@ -497,7 +502,7 @@ router.post('chpasswd',
     },function(reason){
       log.error({time: Date()}, "Unable to Change Passwords");
       log.debug({time: Date()},reason);
-      res.render('settings',{user : req.user,message:reason});
+      res.render('settings',{user : req.user,msg: "True",message:reason});
     });
 
 });
@@ -508,8 +513,9 @@ router.post('/chemail',
      // Reject invalid email
     if (!validEmail(req.body.email) || !validEmail(req.body.emailc)) {
         log.warn({time: Date()}, "Invalid Email");
-        return res.render('chpasswd',{
+        return res.render('chemail',{
             user:req.user,
+            msg: "True",
             message: "Invalid Email",
             rules:[
                 {rule: "Please use an valid email!"}
@@ -521,6 +527,7 @@ router.post('/chemail',
         log.warn({time: Date()}, "Passwords don't Match!");
         return res.render('chemail',{
             user:req.user,
+            msg: "True",
             message: "Emails Don't Match!",
             rules: [
                 {rule: "Emails Must Match!"}
@@ -579,7 +586,7 @@ router.post('/chemail',
     },function(reason){
       log.error({time: Date()}, "Unable to Change Email");
       log.debug({time: Date()}, reason);
-      res.render('settings',{message:reason});
+      res.render('settings',{message:reason,msg: "True"});
     });
 });
 
