@@ -13,7 +13,7 @@ task additions. Its web UI was implemented using boostrap.
 
 ###Usage
 ```bash
-git clone https://github.com/vargash1/vTodo
+git clone  https://github.com/vargash1/vTodo.git
 node bin/www | bunyan & 
 ```
 
