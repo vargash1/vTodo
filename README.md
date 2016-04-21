@@ -23,7 +23,7 @@ Will run at [port 3000 on localhost](http://localhost:3000/users)
 ###Screenshots
 
 <p align="center">
-   <img src="http://i.imgur.com /uytOL1a.png?1" alt="UI Screenshot"> <br>
+   <img src="http://i.imgur.com/uytOL1a.png?1" alt="UI Screenshot"> <br>
    <img src="http://i.imgur.com/758fcB2.png?1" alt="Modifying a Task"> <br>
    <img src="http://i.imgur.com/M4E4F7E.png?1" alt="Changing Task Color"> <br>
    <img src="http://i.imgur.com/qhq5O46.png" alt="Deleting a Task"> <br>
